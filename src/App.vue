@@ -46,13 +46,15 @@
             <div v-html="showImage(item.multipleImageUrl)"></div>
         </template>
 
-        <template v-slot:[`item._id`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item._id)" >mdi-account-edit-outline</v-icon>
-          <!-- <v-icon small @click="deleteItem(item._id)">delete</v-icon> -->
-          <v-icon small color="blue darken-2">mdi-message-text</v-icon>
-          <v-icon
-            :color="item._id?'success':'error'"
-          >{{item._id?'mdi-check':'mdi-close'}}</v-icon>
+        <template v-slot:body="{ item }">
+          <!-- <tr v-for="item in items" :key="item.scannedDeviceId">
+            <td>{{ item.deviceType }}</td>
+            <td>{{ item.role }}</td>
+            <td>{{ item.deviceStatus }}</td>
+            <td>{{ item.activationDate }}</td>
+            <td><v-icon large @click="deleteFob(item)"> mdi-access-point-remove </v-icon></td>
+          </tr>  -->
+          <v-icon large @click="deleteFob(item)"> mdi-access-point-remove </v-icon>
         </template>
 
       </v-data-table>      
