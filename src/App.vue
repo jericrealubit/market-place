@@ -8,49 +8,75 @@
     </v-app-bar>
 
     <v-main class="mt-10 mx-auto">
-      <!-- Login Module -->
-      <!-- <v-card width="400" class="mx-auto mt-5">
-        <v-card-title>
-          <h1 class="display-1">Login</h1>
-        </v-card-title>
-        <v-card-text>
-          <v-form>
-            <v-text-field label="Username" prepend-icon="mdi-account-circle" />
-            <v-text-field label="Password" 
-              :type="showPassword ? 'text' : 'password'" 
-              prepend-icon="mdi-lock" 
-              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append="showPassword = !showPassword"
-            />
-          </v-form>
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-        <v-btn color="success">Register</v-btn>
-        <v-spacer></v-spacer>
-        <v-btn color="info">Login</v-btn>
-      </v-card-actions>
-      </v-card>     -->
-
+      
+      <v-card class="d-flex align-end flex-column" flat tile >
+        <v-icon class="pr-11" medium @click="insertDoc(item._id)" title="Add">mdi-account-plus-outline</v-icon>   
+      </v-card>   
       <v-data-table
         :headers="headTitle"
         :items="profiles"
-        :items-per-page="5"
-        class="elevation-1"
+        :search="search"
+        :items-per-page="10"        
         :loading="loading"
-        loading-text="Loading... Please wait"
+        loading-text="Loading... Please wait"        
+        class="elevation-1"
       >
-        <template v-slot:[`item.imageUrl`]="{ item }">
-            <img :src="item.imageUrl" style="width: 50px; height: 50px" />            
-        </template>
-      
-        <template v-slot:[`item.multipleImageUrl`]="{ item }">            
-            <div v-html="showImage(item.multipleImageUrl)"></div>
+      <v-divider inset></v-divider>
+
+        <template v-slot:top>
+          <v-toolbar flat color="white">
+            <div class="d-flex w-100 align-end">
+              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>
+               <v-btn
+                color="primary"
+                class="ml-2 white--text"
+                @click="addNew">
+                <v-icon dark>mdi-account-plus-outline</v-icon>Add
+              </v-btn>
+            </div>
+          </v-toolbar>
         </template>
 
-        <template v-slot:[`item._id`]="{ item }">
-          <v-icon small @click="editDoc(item._id)" title="Edit">mdi-pencil</v-icon>
-          <v-icon small @click="deleteDoc(item._id)" title="Delete">mdi-trash-can-outline</v-icon>
+        <template v-slot:[`item.username`]="{ item }">
+          <v-text-field v-model="editedItem.username" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field>
+          <span v-else>{{item.username}}</span>
+        </template>
+
+        <template v-slot:[`item.email`]="{ item }">
+          <v-text-field v-model="editedItem.email" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+          <span v-else>{{item.email}}</span>
+        </template>
+
+        <template v-slot:[`item.imageUrl`]="{ item }">
+          <v-text-field v-model="editedItem.imageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+          <img v-else :src="item.imageUrl" style="width: 50px; height: 50px" />            
+        </template>
+
+        <template v-slot:[`item.multipleImageUrl`]="{ item }">
+          <v-text-field v-model="editedItem.multipleImageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+          <div v-else v-html="showImage(item.multipleImageUrl)"></div>
+        </template>
+
+        <template v-slot:[`item.actions`]="{ item }">
+          <div v-if="item._id === editedItem._id">
+            <v-icon color="red" class="mr-3" @click="close">
+              mdi-window-close
+            </v-icon>
+            <v-icon color="green"  @click="save">
+              mdi-content-save
+            </v-icon>
+          </div>
+          <div v-else>
+            <v-icon color="green" class="mr-3" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon color="red" @click="deleteItem(item)">
+              mdi-delete
+            </v-icon>
+          </div>
+        </template>
+        <template v-slot:no-data>
+          <v-btn color="primary" @click="getAll">Reset</v-btn>
         </template>
 
       </v-data-table>   
@@ -64,21 +90,9 @@
         justify="center"
         no-gutters
       >
-        <!-- <v-btn
-          v-for="link in links"
-          :key="link"
-          color="white"
-          text
-          rounded
-          class="my-2"
-        >
-          {{ link }}
-        </v-btn> -->
-    
-      <v-card-text class="py-2 white--text text-center">
-        {{ new Date().getFullYear() }} — <strong>Profiles</strong>
-      </v-card-text>
-
+        <v-card-text class="py-2 white--text text-center">
+          {{ new Date().getFullYear() }} — <strong>Profiles</strong>
+        </v-card-text>
       </v-row>
     </v-footer>
     
@@ -91,6 +105,7 @@ export default {
   name: 'App',
 
   data: () => ({
+    search: '',
     loading: true,
     showPassword: false,
     profiles: [],
@@ -106,12 +121,25 @@ export default {
       { text: "Email", value: "email" },
       { text: "Images", value: "imageUrl" },
       { text: "Multiple Images", value: "multipleImageUrl" },
-      { text: "Actions", value: "_id" }
+      { text: "Actions", value: "actions" }
     ],    
     links: [
       'Home',
       'Login'
     ],   
+    editedIndex: -1,
+    editedItem: {      
+      username: '',
+      email: '',
+      multipleImageUrl: '',
+      imageUrl: ''
+    },
+    defaultItem: {      
+      username: '',
+      email: '',
+      multipleImageUrl: '',
+      imageUrl: ''
+    }
   }),
   methods: {      
       showImage(imageUrls) {
@@ -200,10 +228,45 @@ export default {
         .catch((err) => {
           if (err) throw err;
         })
-      }
+      },
+      editItem(item) {
+        this.editedIndex = this.profiles.indexOf(item);
+        this.editedItem = Object.assign({}, item);
+      },
+
+      deleteItem(item) {
+        const index = this.desserts.indexOf(item);
+        confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1);
+      },
+      close() {
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        }, 300)
+      },
+      addNew() {
+        const addObj = Object.assign({}, this.defaultItem);        
+        this.profiles.unshift(addObj);
+        this.editItem(addObj);
+      },
+      save() {
+        if (this.editedIndex > -1) {
+          Object.assign(this.profiles[this.editedIndex], this.editedItem)
+        }
+        this.close()
+      },
     },
     mounted() {      
       this.getAll();
     }
 };
 </script>
+
+<style>
+
+  /* striped */
+  tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, .05);
+  }
+
+</style>
