@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark dense>
       <v-toolbar-title>Profiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>      
@@ -37,33 +37,28 @@
         :items="profiles"
         :items-per-page="5"
         class="elevation-1"
+        :loading="loading"
+        loading-text="Loading... Please wait"
       >
         <template v-slot:[`item.imageUrl`]="{ item }">
-            <img :src="item.imageUrl" style="width: 50px; height: 50px" />
+            <img :src="item.imageUrl" style="width: 50px; height: 50px" />            
         </template>
       
         <template v-slot:[`item.multipleImageUrl`]="{ item }">            
             <div v-html="showImage(item.multipleImageUrl)"></div>
         </template>
 
-        <template v-slot:body="{ item }">
-          <!-- <tr v-for="item in items" :key="item.scannedDeviceId">
-            <td>{{ item.deviceType }}</td>
-            <td>{{ item.role }}</td>
-            <td>{{ item.deviceStatus }}</td>
-            <td>{{ item.activationDate }}</td>
-            <td><v-icon large @click="deleteFob(item)"> mdi-access-point-remove </v-icon></td>
-          </tr>  -->
-          <v-icon large @click="deleteFob(item)"> mdi-access-point-remove </v-icon>
+        <template v-slot:[`item._id`]="{ item }">
+          <v-icon small @click="editDoc(item._id)" title="Edit">mdi-pencil</v-icon>
+          <v-icon small @click="deleteDoc(item._id)" title="Delete">mdi-trash-can-outline</v-icon>
         </template>
 
-      </v-data-table>      
-
+      </v-data-table>   
     </v-main>
     
     <v-footer
       color="primary lighten-1"
-      padless
+      padless       
     >
       <v-row
         justify="center"
@@ -79,12 +74,11 @@
         >
           {{ link }}
         </v-btn> -->
-        <v-col
-          class="primary lighten-2 py-4 text-center white--text"
-          cols="12"
-        >
-          {{ new Date().getFullYear() }} — <strong>Profiles</strong>
-        </v-col>
+    
+      <v-card-text class="py-2 white--text text-center">
+        {{ new Date().getFullYear() }} — <strong>Profiles</strong>
+      </v-card-text>
+
       </v-row>
     </v-footer>
     
@@ -97,6 +91,7 @@ export default {
   name: 'App',
 
   data: () => ({
+    loading: true,
     showPassword: false,
     profiles: [],
     id: "", // id to update PUT:id, was set by GET:id
@@ -111,7 +106,7 @@ export default {
       { text: "Email", value: "email" },
       { text: "Images", value: "imageUrl" },
       { text: "Multiple Images", value: "multipleImageUrl" },
-      { text: "Actions", value: "actions" }
+      { text: "Actions", value: "_id" }
     ],    
     links: [
       'Home',
@@ -200,6 +195,7 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           this.profiles = data
+          this.loading = false
         })
         .catch((err) => {
           if (err) throw err;
