@@ -17,6 +17,8 @@
         :loading="loading"
         loading-text="Loading... Please wait"        
         class="elevation-1"
+        :sort-by="['_id']"
+        :sort-desc="[true]"
       >
       <v-divider inset></v-divider>
 
@@ -119,7 +121,8 @@ export default {
       { text: "Email", value: "email" },
       { text: "Images", value: "imageUrl" },
       { text: "Multiple Images", value: "multipleImageUrl" },
-      { text: "Actions", value: "actions" }
+      { text: "Actions", value: "actions" },
+      { text: "_id", value: "_id", align: ' d-none' }
     ],    
     links: [
       'Home',
@@ -246,7 +249,7 @@ export default {
       },
       addNew() {
         const addObj = Object.assign({}, this.defaultItem);        
-        this.profiles.unshift(addObj);
+        this.profiles.push(addObj);
         this.editItem(addObj);
       },
       save() {
