@@ -8,10 +8,7 @@
     </v-app-bar>
 
     <v-main class="mt-10 mx-auto">
-      
-      <v-card class="d-flex align-end flex-column" flat tile >
-        <v-icon class="pr-11" medium @click="insertDoc(item._id)" title="Add">mdi-account-plus-outline</v-icon>   
-      </v-card>   
+             
       <v-data-table
         :headers="headTitle"
         :items="profiles"
@@ -25,9 +22,10 @@
 
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <div class="d-flex w-100 align-end">
-              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>
-               <v-btn
+            <v-spacer />
+            <div class="d-flex w-100">              
+              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>              
+              <v-btn                
                 color="primary"
                 class="ml-2 white--text"
                 @click="addNew">
@@ -269,4 +267,11 @@ export default {
     background-color: rgba(0, 0, 0, .05);
   }
 
+  .v-btn:not(.v-btn--round).v-size--default {
+    height: auto;
+  }
+  
+  .w-100 {
+    width: 100%
+  }
 </style>
