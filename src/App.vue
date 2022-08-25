@@ -230,11 +230,13 @@ export default {
       editItem(item) {
         this.editedIndex = this.profiles.indexOf(item);
         this.editedItem = Object.assign({}, item);
+        this.id = item._id
+        //console.log(this.formValues)
       },
 
       deleteItem(item) {
-        const index = this.desserts.indexOf(item);
-        confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1);
+        const index = this.profiles.indexOf(item);
+        confirm('Are you sure you want to delete this item?') && this.profiles.splice(index, 1);
       },
       close() {
         setTimeout(() => {
@@ -249,7 +251,30 @@ export default {
       },
       save() {
         if (this.editedIndex > -1) {
+          //console.log(this.editedItem)
+          this.formValues.username = this.editedItem.username
+          this.formValues.email = this.editedItem.email
+          this.formValues.imageUrl = this.editedItem.imageUrl
+          this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl 
+          console.log(this.formValues)
           Object.assign(this.profiles[this.editedIndex], this.editedItem)
+          let fetchApi = (this.id) ? (api + this.id) : api;
+          let fetchMethod = (this.id) ? "PUT" : "POST";
+          fetch(fetchApi, {
+              method: fetchMethod,
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(this.formValues)
+            })
+            .then((response) => response.text())
+            .then((data) => {
+              console.log(data)
+              this.getAll();
+            })
+            .catch((err) => {
+              if (err) throw err;
+            })        
         }
         this.close()
       },
