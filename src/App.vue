@@ -8,7 +8,11 @@
     </v-app-bar>
 
     <v-main class="mt-10 mx-auto">
-             
+      <v-card>
+        <v-card-text>
+          <div>! record Inserted</div>
+        </v-card-text>
+      </v-card>
       <v-data-table
         :headers="headTitle"
         :items="profiles"
@@ -17,8 +21,6 @@
         :loading="loading"
         loading-text="Loading... Please wait"        
         class="elevation-1"
-        :sort-by="['_id']"
-        :sort-desc="[true]"
       >
       <v-divider inset></v-divider>
 
@@ -105,6 +107,7 @@ export default {
   name: 'App',
 
   data: () => ({
+    add: true,
     search: '',
     loading: true,
     showPassword: false,
@@ -122,7 +125,6 @@ export default {
       { text: "Images", value: "imageUrl" },
       { text: "Multiple Images", value: "multipleImageUrl" },
       { text: "Actions", value: "actions" },
-      { text: "_id", value: "_id", align: ' d-none' }
     ],    
     links: [
       'Home',
@@ -235,22 +237,43 @@ export default {
         this.editedItem = Object.assign({}, item);
         this.id = item._id
         //console.log(this.formValues)
+        this.add = false
       },
-
       deleteItem(item) {
-        const index = this.profiles.indexOf(item);
-        confirm('Are you sure you want to delete this item?') && this.profiles.splice(index, 1);
+        if (confirm('Are you sure you want to delete this item?')) {
+          const index = this.profiles.indexOf(item);
+          this.profiles.splice(index, 1);
+          fetch(api + item._id, {
+              method: 'DELETE'           
+            })
+            .then((response) => response.text())
+            .then((data) => {
+              console.log(data)
+              this.getAll();
+            })
+            .catch((err) => {
+              if (err) throw err;
+            })
+          console.log("confirm delete")
+        } else {
+          console.log("cancel delete")
+        }
       },
       close() {
         setTimeout(() => {
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
+          if (this.add) {
+            this.profiles.shift(this.editedItem);
+            this.editItem(this.editedItem);
+          }
         }, 300)
       },
       addNew() {
         const addObj = Object.assign({}, this.defaultItem);        
-        this.profiles.push(addObj);
+        this.profiles.unshift(addObj);
         this.editItem(addObj);
+        this.add = true
       },
       save() {
         if (this.editedIndex > -1) {
