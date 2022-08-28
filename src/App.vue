@@ -29,7 +29,8 @@
             <v-spacer />
             <div class="d-flex w-100">              
               <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>              
-              <v-btn                
+              <v-btn
+                title="Add New Profile"
                 color="primary"
                 class="ml-2 white--text"
                 @click="addNew">
@@ -61,18 +62,18 @@
 
         <template v-slot:[`item.actions`]="{ item }">
           <div v-if="item._id === editedItem._id">
-            <v-icon color="red" class="mr-3" @click="close">
+            <v-icon color="red" class="mr-3" @click="close" title="Cancel">
               mdi-window-close
             </v-icon>
-            <v-icon color="green"  @click="save">
+            <v-icon color="green"  @click="save" title="Save">
               mdi-content-save
             </v-icon>
           </div>
           <div v-else>
-            <v-icon color="green" class="mr-3" @click="editItem(item)">
+            <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
               mdi-pencil
             </v-icon>
-            <v-icon color="red" @click="deleteItem(item)">
+            <v-icon color="red" @click="deleteItem(item)" title="Delete">
               mdi-delete
             </v-icon>
           </div>
