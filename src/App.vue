@@ -9,8 +9,8 @@
 
     <v-main class="mt-10 mx-auto">
       <v-card>
-        <v-card-text>
-          <div>! record Inserted</div>
+        <v-card-text class="pl-10 pb-0">
+          <div>* {{ msg }}</div>
         </v-card-text>
       </v-card>
       <v-data-table
@@ -107,6 +107,7 @@ export default {
   name: 'App',
 
   data: () => ({
+    msg: '',
     add: true,
     search: '',
     loading: true,
@@ -156,71 +157,6 @@ export default {
         }         
         return urls;
       },
-      insertDoc() { // done
-        fetch(api, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.formValues)            
-          })
-          .then((response) => response.text())
-          .then((data) => {
-            console.log(data)
-            this.getAll();
-          })
-          .catch((err) => {
-            if (err) throw err;
-          })
-      },
-      updateDoc() {
-        fetch(api + this.id, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.formValues)
-          })
-          .then((response) => response.text())
-          .then((data) => {
-            console.log(data)
-            this.getAll();
-          })
-          .catch((err) => {
-            if (err) throw err;
-          })        
-      },
-      getDoc(id) { // done      
-        this.id = id // PUT:id needs this to update the selected document
-        fetch(api + id, {
-            method: 'GET'
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data)
-            this.formValues.username = data.username
-            this.formValues.email = data.email
-            this.formValues.imageUrl = data.imageUrl
-            this.formValues.multipleImageUrl = data.multipleImageUrl            
-          })
-          .catch((err) => {
-            if (err) throw err;
-          })
-      },
-      deleteDoc(id) { // done
-        fetch(api + id, {
-            method: 'DELETE'           
-          })
-          .then((response) => response.text())
-          .then((data) => {
-            console.log(data)
-            this.getAll();
-          })
-          .catch((err) => {
-            if (err) throw err;
-          })
-        
-      },
       getAll() {
         fetch(api)
         .then((response) => response.json())
@@ -236,7 +172,6 @@ export default {
         this.editedIndex = this.profiles.indexOf(item);
         this.editedItem = Object.assign({}, item);
         this.id = item._id
-        //console.log(this.formValues)
         this.add = false
       },
       deleteItem(item) {
@@ -248,7 +183,7 @@ export default {
             })
             .then((response) => response.text())
             .then((data) => {
-              console.log(data)
+              this.msg = data
               this.getAll();
             })
             .catch((err) => {
@@ -277,7 +212,6 @@ export default {
       },
       save() {
         if (this.editedIndex > -1) {
-          //console.log(this.editedItem)
           this.formValues.username = this.editedItem.username
           this.formValues.email = this.editedItem.email
           this.formValues.imageUrl = this.editedItem.imageUrl
@@ -295,7 +229,7 @@ export default {
             })
             .then((response) => response.text())
             .then((data) => {
-              console.log(data)
+              this.msg = data
               this.getAll();
             })
             .catch((err) => {
