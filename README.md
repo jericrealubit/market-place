@@ -1,4 +1,6 @@
-# my-fe
+# User profile
+https://user-profiles-fe.netlify.app/
+use api: https://rest-api-express-mongodb.netlify.app/.netlify/functions/api/
 
 ## Project setup
 ```
