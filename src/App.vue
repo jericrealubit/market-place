@@ -7,82 +7,103 @@
       <v-btn text rounded>Login</v-btn>
     </v-app-bar>
 
-    <v-main class="mt-10 mx-auto">
-      <v-card>
-        <v-card-text class="pl-10 pb-0">
-          <div>* {{ msg }}</div>
-        </v-card-text>
-      </v-card>
-      <v-data-table
-        :headers="headTitle"
-        :items="profiles"
-        :search="search"
-        :items-per-page="10"        
-        :loading="loading"
-        loading-text="Loading... Please wait"        
-        class="elevation-1"
-      >
-      <v-divider inset></v-divider>
+    <v-main>
 
-        <template v-slot:top>
-          <v-toolbar flat color="white">
-            <v-spacer />
-            <div class="d-flex w-100">              
-              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>              
-              <v-btn
-                title="Add New Profile"
-                color="primary"
-                class="ml-2 white--text"
-                @click="addNew">
-                <v-icon dark>mdi-account-plus-outline</v-icon>Add
-              </v-btn>
-            </div>
-          </v-toolbar>
-        </template>
+      <v-container class="grey lighten-5">
+        <v-row no-gutters>
+          <v-col>
+            <v-card>
+              <v-card-text class="pl-10 pb-0">
+                <div>* {{ msg }}</div>
+              </v-card-text>
+            </v-card>
+            <v-data-table
+              :headers="headTitle"
+              :items="profiles"
+              :search="search"
+              :items-per-page="10"        
+              :loading="loading"
+              loading-text="Loading... Please wait"        
+              class="elevation-1"
+            >
+            <v-divider inset></v-divider>
 
-        <template v-slot:[`item.username`]="{ item }">
-          <v-text-field v-model="editedItem.username" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field>
-          <span v-else>{{item.username}}</span>
-        </template>
+              <template v-slot:top>
+                <v-toolbar flat color="white">
+                  <v-spacer />
+                  <div class="d-flex w-100">              
+                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>              
+                    <v-btn
+                      title="Add New Profile"
+                      color="primary"
+                      class="ml-2 white--text"
+                      @click="addNew">
+                      <v-icon dark>mdi-account-plus-outline</v-icon>Add
+                    </v-btn>
+                  </div>
+                </v-toolbar>
+              </template>
 
-        <template v-slot:[`item.email`]="{ item }">
-          <v-text-field v-model="editedItem.email" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-          <span v-else>{{item.email}}</span>
-        </template>
+              <template v-slot:[`item.username`]="{ item }">
+                <v-text-field v-model="editedItem.username" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field>
+                <span v-else>{{item.username}}</span>
+              </template>
 
-        <template v-slot:[`item.imageUrl`]="{ item }">
-          <v-text-field v-model="editedItem.imageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-          <img v-else :src="item.imageUrl" style="width: 50px; height: 50px" />            
-        </template>
+              <template v-slot:[`item.email`]="{ item }">
+                <v-text-field v-model="editedItem.email" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+                <span v-else>{{item.email}}</span>
+              </template>
 
-        <template v-slot:[`item.multipleImageUrl`]="{ item }">
-          <v-text-field v-model="editedItem.multipleImageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-          <div v-else v-html="showImage(item.multipleImageUrl)"></div>
-        </template>
+              <template v-slot:[`item.imageUrl`]="{ item }">
+                <v-text-field v-model="editedItem.imageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+                <img v-else :src="item.imageUrl" style="width: 50px; height: 50px" />            
+              </template>
 
-        <template v-slot:[`item.actions`]="{ item }">
-          <div v-if="item._id === editedItem._id">
-            <v-icon color="red" class="mr-3" @click="close" title="Cancel">
-              mdi-window-close
-            </v-icon>
-            <v-icon color="green"  @click="save" title="Save">
-              mdi-content-save
-            </v-icon>
-          </div>
-          <div v-else>
-            <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
-              mdi-pencil
-            </v-icon>
-            <v-icon color="red" @click="deleteItem(item)" title="Delete">
-              mdi-delete
-            </v-icon>
-          </div>
-        </template>
-        <template v-slot:no-data>
-          <v-btn color="primary" @click="getAll">Reset</v-btn>
-        </template>
+              <template v-slot:[`item.multipleImageUrl`]="{ item }">
+                <v-text-field v-model="editedItem.multipleImageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
+                <div v-else v-html="showImage(item.multipleImageUrl)"></div>
+              </template>
 
-      </v-data-table>   
+              <template v-slot:[`item.actions`]="{ item }">
+                <div v-if="item._id === editedItem._id">
+                  <v-icon color="red" class="mr-3" @click="close" title="Cancel">
+                    mdi-window-close
+                  </v-icon>
+                  <v-icon color="green"  @click="save" title="Save">
+                    mdi-content-save
+                  </v-icon>
+                </div>
+                <div v-else>
+                  <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
+                    mdi-pencil
+                  </v-icon>
+                  <v-icon color="red" @click="deleteItem(item)" title="Delete">
+                    mdi-delete
+                  </v-icon>
+                </div>
+              </template>
+              <template v-slot:no-data>
+                <v-btn color="primary" @click="getAll">Reset</v-btn>
+              </template>
+
+            </v-data-table>   
+          </v-col>          
+          <v-col>
+            <v-card 
+              class="pa-10"
+              elevation="2"
+            >
+          
+              <v-file-input
+                accept="image/*"
+                label="File input"
+                show-size
+              ></v-file-input>
+          
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
     
     <v-footer
