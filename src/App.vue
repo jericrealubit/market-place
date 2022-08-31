@@ -98,6 +98,7 @@
                 accept="image/*"
                 label="File input"
                 show-size
+                @change="doUpload"
               ></v-file-input>
           
             </v-card>
@@ -168,102 +169,148 @@ export default {
     }
   }),
   methods: {      
-      showImage(imageUrls) {
-        let urls = '';
-        if (imageUrls) {          
-          const imgArr = imageUrls.split(',')  
-          // return imgArr.length
-          imgArr.forEach(element => {
-            urls += `<img src="${element}" width="50">`
-          });          
-        }         
-        return urls;
-      },
-      getAll() {
-        fetch(api)
-        .then((response) => response.json())
-        .then((data) => {
-          this.profiles = data
-          this.loading = false
-        })
-        .catch((err) => {
-          if (err) throw err;
-        })
-      },
-      editItem(item) {
-        this.editedIndex = this.profiles.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.id = item._id
-        this.add = false
-      },
-      deleteItem(item) {
-        if (confirm('Are you sure you want to delete this item?')) {
-          const index = this.profiles.indexOf(item);
-          this.profiles.splice(index, 1);
-          fetch(api + item._id, {
-              method: 'DELETE'           
-            })
-            .then((response) => response.text())
-            .then((data) => {
-              this.msg = data
-              this.getAll();
-            })
-            .catch((err) => {
-              if (err) throw err;
-            })
-          console.log("confirm delete")
-        } else {
-          console.log("cancel delete")
-        }
-      },
-      close() {
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          if (this.add) {
-            this.profiles.shift(this.editedItem);
-            this.editItem(this.editedItem);
-          }
-        }, 300)
-      },
-      addNew() {
-        const addObj = Object.assign({}, this.defaultItem);        
-        this.profiles.unshift(addObj);
-        this.editItem(addObj);
-        this.add = true
-      },
-      save() {
-        if (this.editedIndex > -1) {
-          this.formValues.username = this.editedItem.username
-          this.formValues.email = this.editedItem.email
-          this.formValues.imageUrl = this.editedItem.imageUrl
-          this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl 
-          console.log(this.formValues)
-          Object.assign(this.profiles[this.editedIndex], this.editedItem)
-          let fetchApi = (this.id) ? (api + this.id) : api;
-          let fetchMethod = (this.id) ? "PUT" : "POST";
-          fetch(fetchApi, {
-              method: fetchMethod,
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(this.formValues)
-            })
-            .then((response) => response.text())
-            .then((data) => {
-              this.msg = data
-              this.getAll();
-            })
-            .catch((err) => {
-              if (err) throw err;
-            })        
-        }
-        this.close()
-      },
+    doUpload(event) {
+    
+        //var $files = $(this).get(0).files;
+        console.log(event)
+        console.log(event.lastModified)
+
+        // if ($files.length) {
+        //   // Reject big files
+        //   if ($files[0].size > $(this).data('max-size') * 1024) {
+        //     console.log('Please select a smaller file');
+        //     return false;
+        //   }
+
+        //   // Begin file upload
+        //   console.log('Uploading file to Imgur..');
+
+        //   // Replace ctrlq with your own API key
+        //   var apiUrl = 'https://api.imgur.com/3/image';
+        //   var apiKey = 'ctrlq';
+
+        //   var settings = {
+        //     async: false,
+        //     crossDomain: true,
+        //     processData: false,
+        //     contentType: false,
+        //     type: 'POST',
+        //     url: apiUrl,
+        //     headers: {
+        //       Authorization: 'Client-ID ' + apiKey,
+        //       Accept: 'application/json',
+        //     },
+        //     mimeType: 'multipart/form-data',
+        //   };
+
+        //   var formData = new FormData();
+        //   formData.append('image', $files[0]);
+        //   settings.data = formData;
+
+        //   // Response contains stringified JSON
+        //   // Image URL available at response.data.link
+        //   $.ajax(settings).done(function (response) {
+        //     console.log(response);
+        //   });
+        // }
+      
     },
-    mounted() {      
-      this.getAll();
-    }
+    showImage(imageUrls) {
+      let urls = '';
+      if (imageUrls) {          
+        const imgArr = imageUrls.split(',')  
+        // return imgArr.length
+        imgArr.forEach(element => {
+          urls += `<img src="${element}" width="50">`
+        });          
+      }         
+      return urls;
+    },
+    getAll() {
+      fetch(api)
+      .then((response) => response.json())
+      .then((data) => {
+        this.profiles = data
+        this.loading = false
+      })
+      .catch((err) => {
+        if (err) throw err;
+      })
+    },
+    editItem(item) {
+      this.editedIndex = this.profiles.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.id = item._id
+      this.add = false
+    },
+    deleteItem(item) {
+      if (confirm('Are you sure you want to delete this item?')) {
+        const index = this.profiles.indexOf(item);
+        this.profiles.splice(index, 1);
+        fetch(api + item._id, {
+            method: 'DELETE'           
+          })
+          .then((response) => response.text())
+          .then((data) => {
+            this.msg = data
+            this.getAll();
+          })
+          .catch((err) => {
+            if (err) throw err;
+          })
+        console.log("confirm delete")
+      } else {
+        console.log("cancel delete")
+      }
+    },
+    close() {
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        if (this.add) {
+          this.profiles.shift(this.editedItem);
+          this.editItem(this.editedItem);
+        }
+      }, 300)
+    },
+    addNew() {
+      const addObj = Object.assign({}, this.defaultItem);        
+      this.profiles.unshift(addObj);
+      this.editItem(addObj);
+      this.add = true
+    },
+    save() {
+      if (this.editedIndex > -1) {
+        this.formValues.username = this.editedItem.username
+        this.formValues.email = this.editedItem.email
+        this.formValues.imageUrl = this.editedItem.imageUrl
+        this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl 
+        console.log(this.formValues)
+        Object.assign(this.profiles[this.editedIndex], this.editedItem)
+        let fetchApi = (this.id) ? (api + this.id) : api;
+        let fetchMethod = (this.id) ? "PUT" : "POST";
+        fetch(fetchApi, {
+            method: fetchMethod,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.formValues)
+          })
+          .then((response) => response.text())
+          .then((data) => {
+            this.msg = data
+            this.getAll();
+          })
+          .catch((err) => {
+            if (err) throw err;
+          })        
+      }
+      this.close()
+    },
+  },
+  mounted() {      
+    this.getAll();
+  }
 };
 </script>
 
