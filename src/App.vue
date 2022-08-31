@@ -9,7 +9,7 @@
 
     <v-main>
 
-      <v-container class="grey lighten-5">
+      <v-container class="grey lighten-5" height="100%">
         <v-row no-gutters>
           <v-col>
             <v-card>
@@ -100,6 +100,13 @@
                 show-size
                 @change="doUpload"
               ></v-file-input>
+              <h4>{{uploadedImage}}</h4>
+              <v-img
+                lazy-src="https://picsum.photos/id/11/10/6"
+                max-height="150"
+                max-width="250"
+                :src="uploadedImage"
+              ></v-img>
           
             </v-card>
           </v-col>
@@ -130,6 +137,7 @@ export default {
   name: 'App',
 
   data: () => ({
+    uploadedImage: '',
     msg: '',
     add: true,
     search: '',
@@ -192,6 +200,7 @@ export default {
             console.log("API response ↓");
             console.log(response);
             console.log(response.data.data.url)
+            this.uploadedImage = response.data.data.url;
           })
           .catch((err) => {
             console.log("API error ↓");
