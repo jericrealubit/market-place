@@ -171,48 +171,40 @@ export default {
   methods: {      
     doUpload(event) {
     
-        //var $files = $(this).get(0).files;
-        console.log(event)
-        console.log(event.lastModified)
+      const axios = require("axios");
+      const formData = require("form-data");
+      try {
+        console.log("ping !");
 
-        // if ($files.length) {
-        //   // Reject big files
-        //   if ($files[0].size > $(this).data('max-size') * 1024) {
-        //     console.log('Please select a smaller file');
-        //     return false;
-        //   }
+        const myForm = new formData();
+        myForm.append("image", event);
 
-        //   // Begin file upload
-        //   console.log('Uploading file to Imgur..');
+        axios
+          .post(
+            `https://api.imgbb.com/1/upload?key=bdcadd576cf26e4fe1f31de4594ca4fd`,
+            myForm, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+          .then((response) => {
+            console.log("API response ↓");
+            console.log(response);
+            console.log(response.data.data.url)
+          })
+          .catch((err) => {
+            console.log("API error ↓");
+            console.log(err);
 
-        //   // Replace ctrlq with your own API key
-        //   var apiUrl = 'https://api.imgur.com/3/image';
-        //   var apiKey = 'ctrlq';
-
-        //   var settings = {
-        //     async: false,
-        //     crossDomain: true,
-        //     processData: false,
-        //     contentType: false,
-        //     type: 'POST',
-        //     url: apiUrl,
-        //     headers: {
-        //       Authorization: 'Client-ID ' + apiKey,
-        //       Accept: 'application/json',
-        //     },
-        //     mimeType: 'multipart/form-data',
-        //   };
-
-        //   var formData = new FormData();
-        //   formData.append('image', $files[0]);
-        //   settings.data = formData;
-
-        //   // Response contains stringified JSON
-        //   // Image URL available at response.data.link
-        //   $.ajax(settings).done(function (response) {
-        //     console.log(response);
-        //   });
-        // }
+            if (err.response.data.error) {
+              console.log(err.response.data.error);
+              //When trouble shooting, simple informations about the error can be found in err.response.data.error so it's good to display it
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
       
     },
     showImage(imageUrls) {
@@ -290,20 +282,20 @@ export default {
         let fetchApi = (this.id) ? (api + this.id) : api;
         let fetchMethod = (this.id) ? "PUT" : "POST";
         fetch(fetchApi, {
-            method: fetchMethod,
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.formValues)
-          })
-          .then((response) => response.text())
-          .then((data) => {
-            this.msg = data
-            this.getAll();
-          })
-          .catch((err) => {
-            if (err) throw err;
-          })        
+          method: fetchMethod,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.formValues)
+        })
+        .then((response) => response.text())
+        .then((data) => {
+          this.msg = data
+          this.getAll();
+        })
+        .catch((err) => {
+          if (err) throw err;
+        })        
       }
       this.close()
     },
