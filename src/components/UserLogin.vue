@@ -66,6 +66,7 @@
 </template>
 
 <script>
+    //const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
     export default {
       name: 'UserLogin',
       data: () => ({
@@ -109,6 +110,31 @@
             }
             },
         methods: {
+            register() {
+
+                this.formValues.username = this.editedItem.username
+                this.formValues.email = this.editedItem.email
+                this.formValues.imageUrl = this.editedItem.imageUrl
+                this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl
+                console.log(this.formValues)
+
+                // fetch(apiUsers, {
+                //     method: "POST",
+                //     headers: {
+                //     'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify(this.formValues)
+                // })
+                // .then((response) => response.text())
+                // .then((data) => {
+                //     this.msg = data
+                //     this.getAll();
+                // })
+                // .catch((err) => {
+                //     if (err) throw err;
+                // })
+
+            },
             validate() {
                 if (this.$refs.loginForm.validate()) {
                 // submit form to server/API here...
