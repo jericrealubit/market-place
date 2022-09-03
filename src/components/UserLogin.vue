@@ -4,9 +4,9 @@
         <div>
             <v-tabs v-model="tab" show-arrows background-color="blue accent-4" icons-and-text dark grow>
             <v-tabs-slider color="blue darken-4"></v-tabs-slider>
-            <v-tab v-for="i in tabs" :key="i">
-                <v-icon large>{{ i.icon }}</v-icon>
-                <div class="caption py-1">{{ i.name }}</div>
+            <v-tab v-for="(tab, i) in tabs" :key="i">
+                <v-icon large>{{ tab.icon }}</v-icon>
+                <div class="caption py-1">{{ tab.name }}</div>
             </v-tab>
             <v-tab-item>
                 <v-card class="px-4">
@@ -36,16 +36,16 @@
                     <v-form ref="registerForm" v-model="valid" lazy-validation>
                     <v-row>
                         <v-col cols="12" sm="6" md="6">
-                        <v-text-field v-model="firstName" :rules="[rules.required]" label="First Name" maxlength="20" required></v-text-field>
+                        <v-text-field v-model="formValues.firstName" :rules="[rules.required]" label="First Name" maxlength="20" required></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                        <v-text-field v-model="lastName" :rules="[rules.required]" label="Last Name" maxlength="20" required></v-text-field>
+                        <v-text-field v-model="formValues.lastName" :rules="[rules.required]" label="Last Name" maxlength="20" required></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                        <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+                        <v-text-field v-model="formValues.email" :rules="emailRules" label="E-mail" required></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                        <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" name="input-10-1" label="Password" hint="At least 8 characters" counter @click:append="show1 = !show1"></v-text-field>
+                        <v-text-field v-model="formValues.password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" name="input-10-1" label="Password" hint="At least 8 characters" counter @click:append="show1 = !show1"></v-text-field>
                         </v-col>
                         <v-col cols="12">
                         <v-text-field block v-model="verify" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules.required, passwordMatch]" :type="show1 ? 'text' : 'password'" name="input-10-1" label="Confirm Password" counter @click:append="show1 = !show1"></v-text-field>
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-    //const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
+    const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
     export default {
       name: 'UserLogin',
       data: () => ({
@@ -81,11 +81,12 @@
             {name:"Register", icon:"mdi-account-outline"}
         ],
         valid: true,
-
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
+        formValues: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+        },      
         verify: "",
         loginPassword: "",
         loginEmail: "",
@@ -106,38 +107,35 @@
         }),
         computed: {
             passwordMatch() {
-                return () => this.password === this.verify || "Password must match";
+                return () => this.formValues.password === this.verify || "Password must match";
             }
-            },
+        },
         methods: {
-            register() {
+            register(formData) {
+                console.log(formData)
 
-                this.formValues.username = this.editedItem.username
-                this.formValues.email = this.editedItem.email
-                this.formValues.imageUrl = this.editedItem.imageUrl
-                this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl
-                console.log(this.formValues)
-
-                // fetch(apiUsers, {
-                //     method: "POST",
-                //     headers: {
-                //     'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify(this.formValues)
-                // })
-                // .then((response) => response.text())
-                // .then((data) => {
-                //     this.msg = data
-                //     this.getAll();
-                // })
-                // .catch((err) => {
-                //     if (err) throw err;
-                // })
-
+                fetch(apiUsers, {
+                    method: "POST",
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then((response) => response.text())
+                .then((data) => {
+                    console.log(data)
+                })
+                .catch((err) => {
+                    if (err) throw err;
+                })
             },
             validate() {
+                if (this.$refs.registerForm.validate()) {
+                    //console.log(this.formValues)
+                    this.register(this.formValues);
+                }
                 if (this.$refs.loginForm.validate()) {
-                // submit form to server/API here...
+                    // submit form to server/API here...
                 }
             },
             reset() {
