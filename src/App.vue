@@ -1,14 +1,14 @@
 <template>
   <v-app>
 
-    <UserLogin />
+    <UserLogin @logged-user="setLoggedUser" />
 
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
       <v-toolbar-title>Profiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
-      <v-btn text rounded>guest</v-btn>
+      <v-btn text rounded>{{ loggedUser }}</v-btn>
     </v-app-bar>
 
     <!-- main -->
@@ -56,8 +56,12 @@
     name: 'App',
 
     data: () => ({
+      loggedUser: "guest"
     }),
     methods: {
+      setLoggedUser(loggedInUser) {
+        this.loggedUser = loggedInUser;
+      }
     }
   };
 </script>

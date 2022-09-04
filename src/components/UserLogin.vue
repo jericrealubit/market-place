@@ -151,7 +151,8 @@
             .then((response) => response.text())
             .then((data) => {
                 console.log(data)
-                //this.loggedInUser = data.firstName // emet this
+                this.loggedUser = data.firstname +' '+ data.lastname
+                this.$emit("logged-user", this.loggedUser);
                 this.dialog = false;
             })
             .catch((err) => {
@@ -168,7 +169,7 @@
                 && element.password == this.loginFormValue.loginPassword
             ) {
                 this.loggedUser = element.firstname + " " + element.lastname;
-                console.log(this.loggedUser)
+                this.$emit("logged-user", this.loggedUser);
             }
             });
             if (this.loggedUser) {
