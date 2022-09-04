@@ -1,11 +1,14 @@
 <template>
   <v-app>
+
+    <UserLogin />
+
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
       <v-toolbar-title>Profiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
-      <v-btn text rounded>Login</v-btn>
+      <v-btn text rounded>guest</v-btn>
     </v-app-bar>
 
     <!-- main -->
@@ -47,18 +50,14 @@
 <script>
   import ProfileList from "./components/ProfileList.vue"
   import UploadImage from "./components/UploadImage.vue"
+  import UserLogin from "./components/UserLogin.vue"
   export default {
-    components: { ProfileList, UploadImage },
+    components: { ProfileList, UploadImage, UserLogin },
     name: 'App',
 
     data: () => ({
-      links: [
-        'Home',
-        'Login'
-      ],
     }),
     methods: {
-
     }
   };
 </script>

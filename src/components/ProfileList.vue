@@ -198,9 +198,7 @@
           let fetchMethod = (this.id) ? "PUT" : "POST";
           fetch(fetchApi, {
             method: fetchMethod,
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(this.formValues)
           })
           .then((response) => response.text())
