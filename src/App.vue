@@ -8,7 +8,7 @@
       <v-toolbar-title>Profiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
-      <v-btn text rounded>Login</v-btn>
+      <v-btn text rounded>guest</v-btn>
     </v-app-bar>
 
     <!-- main -->
@@ -56,10 +56,6 @@
     name: 'App',
 
     data: () => ({
-      links: [
-        'Home',
-        'Login'
-      ],
     }),
     methods: {
     }
