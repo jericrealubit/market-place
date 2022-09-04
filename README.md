@@ -1,6 +1,9 @@
-# User profile
-https://user-profiles-fe.netlify.app/
-use api: https://rest-api-express-mongodb.netlify.app/.netlify/functions/api/
+## User profile
+### https://user-profiles-fe.netlify.app/
+
+## used apid: 
+### https://rest-api-express-mongodb.netlify.app/.netlify/functions/api/
+### https://github.com/jericrealubit/api-users
 
 ## Project setup
 ```
