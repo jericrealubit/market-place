@@ -143,41 +143,41 @@
       register() {
         let validform = this.$refs.registerForm.validate();
         if (validform) {
-            fetch(apiUsers, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(this.formValues)
-            })
-            .then((response) => response.text())
-            .then((data) => {
-                console.log(data)
-                this.loggedUser = data.firstname +' '+ data.lastname
-                this.$emit("logged-user", this.loggedUser);
-                this.dialog = false;
-            })
-            .catch((err) => {
-                if (err) throw err;
-            })
+          fetch(apiUsers, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.formValues)
+          })
+          .then((response) => response.text())
+          .then((data) => {
+            console.log(data)
+            this.loggedUser = data.firstname +' '+ data.lastname
+            this.$emit("logged-user", this.loggedUser);
+            this.dialog = false;
+          })
+          .catch((err) => {
+              if (err) throw err;
+          })
         }
       },
       login() {
         let validform = this.$refs.loginForm.validate();
         if (validform) {
-            // verify login details
-            this.users.forEach(element => {
+          // verify login details
+          this.users.forEach(element => {
             if (element.email == this.loginFormValue.loginEmail
-                && element.password == this.loginFormValue.loginPassword
+              && element.password == this.loginFormValue.loginPassword
             ) {
-                this.loggedUser = element.firstname + " " + element.lastname;
-                this.$emit("logged-user", this.loggedUser);
+              this.loggedUser = element.firstname + " " + element.lastname;
             }
-            });
-            if (this.loggedUser) {
-                console.log("login successful")
-                this.dialog = false;
-            } else {
-                console.log("login failed")
-            }
+          });
+          if (this.loggedUser) {
+            console.log("login successful")
+            this.dialog = false;
+            this.$emit("logged-user", this.loggedUser);
+          } else {
+            console.log("login failed")
+          }
         }
       }
     },
