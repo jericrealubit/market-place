@@ -45,10 +45,10 @@
           <v-form ref="registerForm" v-model="isFormValid" lazy-validation>
             <v-row>
               <v-col cols="12" sm="6" md="6">
-              <v-text-field v-model="formValues.firstName" :rules="[rules.required]" label="First Name" maxlength="20" required></v-text-field>
+              <v-text-field v-model="formValues.firstname" :rules="[rules.required]" label="First Name" maxlength="20" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-              <v-text-field v-model="formValues.lastName" :rules="[rules.required]" label="Last Name" maxlength="20" required></v-text-field>
+              <v-text-field v-model="formValues.lastname" :rules="[rules.required]" label="Last Name" maxlength="20" required></v-text-field>
               </v-col>
               <v-col cols="12">
               <v-text-field v-model="formValues.email" :rules="emailRules" label="E-mail" required></v-text-field>
@@ -151,9 +151,9 @@
           .then((response) => response.text())
           .then((data) => {
             console.log(data)
-            this.loggedUser = data.firstname +' '+ data.lastname
-            this.$emit("logged-user", this.loggedUser);
             this.dialog = false;
+            this.loggedUser = this.formValues.firstname + " " + this.formValues.lastname
+            this.$emit("logged-user", this.loggedUser);
           })
           .catch((err) => {
               if (err) throw err;
