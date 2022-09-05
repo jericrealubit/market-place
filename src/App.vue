@@ -21,11 +21,7 @@
             <PostList />
 
           </v-col>
-          <v-col>
-
-            <UploadImage />
-
-          </v-col>
+          
         </v-row>
       </v-container>
     </v-main>
@@ -50,11 +46,11 @@
 
 <script>
   // import ProfileList from "./components/ProfileList.vue"
-  import UploadImage from "./components/UploadImage.vue"
+  // import UploadImage from "./components/UploadImage.vue"
   // import UserLogin from "./components/UserLogin.vue"
   import PostList from "./components/PostList.vue"
   export default {
-    components: { UploadImage, PostList },
+    components: { PostList },
     name: 'App',
 
     data: () => ({
