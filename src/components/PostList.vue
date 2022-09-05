@@ -46,32 +46,14 @@
             </template>
           </v-img>
 
-          <v-card-title>{{profile.title}}</v-card-title>
-
+          <v-card-title>${{profile.price}}</v-card-title>
           <v-card-text>
-            <v-row
-              align="center"
-              class="mx-0"
-            >
-              <v-rating
-                :value="5"
-                color="amber"
-                dense
-                half-increments
-                readonly
-                size="14"
-              ></v-rating>
-
-              <div class="grey--text ms-4">
-                4.5 (413)
-              </div>
-            </v-row>
-
-            <div class="my-4 text-subtitle-1">
-              $ {{profile.price}}
+            <div class="text-subtitle-2">
+              {{profile.title}}
             </div>
 
             <div>{{ profile.description }}</div>
+            <div>{{ profile.location }}</div>
           </v-card-text>
         </v-card>
 
@@ -113,7 +95,6 @@
       </template>
 
       <template v-slot:[`item.productimage`]="{ item }">
-        <!-- <v-text-field v-model="editedItem.productimage" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field> -->
         <v-file-input v-if="item._id === editedItem._id"
           v-model="editedItem.productimage"
           :hide-details="true"
