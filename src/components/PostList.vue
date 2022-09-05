@@ -2,77 +2,79 @@
 
   <v-container>
     <v-row>
+
       <v-col
         v-for="(profile, n) in profiles"
         :key="n"
         class="d-flex child-flex pa-4"
-        cols="2"
+        cols="12"
+        xs="6"
+        sm="4"
+        md="3"
+        xl="2"
       >
 
         <v-card
             :loading="loading"
-            class="mx-auto my-12"
+            class="mx-auto my-1"
+        >
+          <template slot="progress">
+            <v-progress-linear
+              color="deep-purple"
+              height="10"
+              indeterminate
+            ></v-progress-linear>
+          </template>
+
+          <v-img
+            :src="profile.productimage"
+            :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
+            aspect-ratio="1"
+            class="grey lighten-2"
           >
-            <template slot="progress">
-              <v-progress-linear
-                color="deep-purple"
-                height="10"
-                indeterminate
-              ></v-progress-linear>
-            </template>
-
-            <v-img
-              :src="profile.productimage"
-              :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
-              aspect-ratio="1"
-              class="grey lighten-2"
-            >
-              <template v-slot:placeholder>
-                <v-row
-                  class="fill-height ma-0"
-                  align="center"
-                  justify="center"
-                >
-                  <v-progress-circular
-                    indeterminate
-                    color="grey lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
-
-            <v-card-title>{{profile.title}}</v-card-title>
-
-            <v-card-text>
+            <template v-slot:placeholder>
               <v-row
+                class="fill-height ma-0"
                 align="center"
-                class="mx-0"
+                justify="center"
               >
-                <v-rating
-                  :value="5"
-                  color="amber"
-                  dense
-                  half-increments
-                  readonly
-                  size="14"
-                ></v-rating>
-
-                <div class="grey--text ms-4">
-                  4.5 (413)
-                </div>
+                <v-progress-circular
+                  indeterminate
+                  color="grey lighten-5"
+                ></v-progress-circular>
               </v-row>
+            </template>
+          </v-img>
 
-              <div class="my-4 text-subtitle-1">
-                $ {{profile.price}}
+          <v-card-title>{{profile.title}}</v-card-title>
+
+          <v-card-text>
+            <v-row
+              align="center"
+              class="mx-0"
+            >
+              <v-rating
+                :value="5"
+                color="amber"
+                dense
+                half-increments
+                readonly
+                size="14"
+              ></v-rating>
+
+              <div class="grey--text ms-4">
+                4.5 (413)
               </div>
+            </v-row>
 
-              <div>{{ profile.description }}</div>
-            </v-card-text>
+            <div class="my-4 text-subtitle-1">
+              $ {{profile.price}}
+            </div>
 
-            
+            <div>{{ profile.description }}</div>
+          </v-card-text>
         </v-card>
-          
-        <!-- </v-img> -->
+
       </v-col>
     </v-row>
 
