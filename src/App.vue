@@ -9,6 +9,9 @@
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
+      <v-btn text rounded @click="logout">
+        <v-icon small>mdi-logout</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <!-- main -->
@@ -17,14 +20,11 @@
         <v-row no-gutters>
           <v-col>
 
-            <ProfileList />
+            <!-- <ProfileList /> -->
+            <PostList />
 
           </v-col>
-          <v-col>
 
-            <UploadImage />
-
-          </v-col>
         </v-row>
       </v-container>
     </v-main>
@@ -48,19 +48,30 @@
 </template>
 
 <script>
-  import ProfileList from "./components/ProfileList.vue"
-  import UploadImage from "./components/UploadImage.vue"
+  // import ProfileList from "./components/ProfileList.vue"
+  // import UploadImage from "./components/UploadImage.vue"
   import UserLogin from "./components/UserLogin.vue"
+  import PostList from "./components/PostList.vue"
   export default {
-    components: { ProfileList, UploadImage, UserLogin },
+    components: { PostList, UserLogin },
     name: 'App',
 
     data: () => ({
       loggedUser: "guest"
     }),
     methods: {
+      logout() {
+        localStorage.removeItem("loggedUser");
+        document.location.reload(true); // force page reload
+      },
       setLoggedUser(loggedInUser) {
+        this.loggedUser =  "guest";
         this.loggedUser = loggedInUser;
+      }
+    },
+    mounted() {
+      if (localStorage.loggedUser) {
+        this.loggedUser = localStorage.loggedUser
       }
     }
   };

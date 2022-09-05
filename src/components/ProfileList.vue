@@ -192,7 +192,6 @@
           this.formValues.email = this.editedItem.email
           this.formValues.imageUrl = this.editedItem.imageUrl
           this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl
-          //console.log(this.formValues)
           Object.assign(this.profiles[this.editedIndex], this.editedItem)
           let fetchApi = (this.id) ? (api + this.id) : api;
           let fetchMethod = (this.id) ? "PUT" : "POST";

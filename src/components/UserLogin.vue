@@ -19,13 +19,14 @@
               <v-col cols="12">
               <v-text-field
                 v-model="loginFormValue.loginPassword"
-                :append-icon="show1?'eye':'eye-off'"
+                :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                 :rules="[rules.required, rules.min]"
                 :type="show1 ? 'text' : 'password'"
                 name="input-10-1" label="Password"
                 hint="At least 8 characters"
                 counter
                 @click:append="show1 = !show1"
+                @keyup.enter="login"
               ></v-text-field>
               </v-col>
               <v-col class="d-flex" cols="12" sm="6" xsm="12">
@@ -169,6 +170,9 @@
               && element.password == this.loginFormValue.loginPassword
             ) {
               this.loggedUser = element.firstname + " " + element.lastname;
+              // localStorage
+              localStorage.userId = element._id;
+              localStorage.loggedUser = this.loggedUser
             }
           });
           if (this.loggedUser) {
@@ -182,6 +186,11 @@
       }
     },
     mounted() {
+      // check if user is logged-in, do not show login form
+      if (localStorage.loggedUser) {
+        this.dialog = false;
+      }
+
       // get all users
       fetch(apiUsers)
         .then((response) => response.json())
