@@ -62,8 +62,7 @@
     methods: {
       logout() {
         localStorage.removeItem("loggedUser");
-        this.$forceUpdate();
-        console.log("logged-out")
+        document.location.reload(true); // force page reload
       },
       setLoggedUser(loggedInUser) {
         this.loggedUser =  "guest";

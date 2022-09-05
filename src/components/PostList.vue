@@ -59,106 +59,107 @@
       </v-col>
     </v-row>
 
-    <!-- message -->
-    <v-card>
-      <v-card-text class="pl-10 pb-0">
-        <div>* {{ msg }}</div>
-      </v-card-text>
-    </v-card>
+    <v-row>
+      <!-- message -->
+      <v-card>
+        <v-card-text class="pl-10 pb-0">
+          <div>* {{ msg }}</div>
+        </v-card-text>
+      </v-card>
 
-    <!-- datatable -->
-    <v-data-table
-      :headers="headTitle"
-      :items="profiles"
-      :search="search"
-      :items-per-page="10"
-      :loading="loading"
-      loading-text="Loading... Please wait"
-      class="elevation-1"
-    >
-      <!-- search bar -->
-      <template v-slot:top>
-        <v-toolbar flat color="white">
-          <v-spacer />
-          <div class="d-flex w-100">
-            <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>
-            <v-btn
-              title="Add New Profile"
-              color="primary"
-              class="ml-2 white--text"
-              @click="addNew">
-              <v-icon dark>mdi-storefront-plus</v-icon>Add
-            </v-btn>
+      <!-- datatable -->
+      <v-data-table
+        :headers="headTitle"
+        :items="profiles"
+        :search="search"
+        :items-per-page="10"
+        :loading="loading"
+        loading-text="Loading... Please wait"
+        class="elevation-1"
+      >
+        <!-- search bar -->
+        <template v-slot:top>
+          <v-toolbar flat color="white">
+            <v-spacer />
+            <div class="d-flex w-100">
+              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line hide-details></v-text-field>
+              <v-btn
+                title="Add New Profile"
+                color="primary"
+                class="ml-2 white--text"
+                @click="addNew">
+                <v-icon dark>mdi-storefront-plus</v-icon>Add
+              </v-btn>
+            </div>
+          </v-toolbar>
+        </template>
+
+        <template v-slot:[`item.productimage`]="{ item }">
+          <v-file-input v-if="item._id === editedItem._id"
+            v-model="editedItem.productimage"
+            :hide-details="true"
+            dense
+            single-line
+            :autofocus="true"
+            accept="image/*"
+            show-size
+            prepend-icon="mdi-camera"
+            @change="uploadImage"
+          ></v-file-input>
+          <span v-else>
+            <v-img
+              lazy-src="https://picsum.photos/id/11/10/6"
+              max-height="50"
+              max-width="50"
+              :src="item.productimage"
+            ></v-img>
+          </span>
+        </template>
+
+        <template v-slot:[`item.price`]="{ item }">
+          <v-text-field v-model="editedItem.price" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+          <span v-else>{{item.price}}</span>
+        </template>
+
+        <template v-slot:[`item.title`]="{ item }">
+          <v-text-field v-model="editedItem.title" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+          <span v-else>{{item.title}}</span>
+        </template>
+
+        <template v-slot:[`item.description`]="{ item }">
+          <v-text-field v-model="editedItem.description" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+          <span v-else>{{item.description}}</span>
+        </template>
+
+        <template v-slot:[`item.location`]="{ item }">
+          <v-text-field v-model="editedItem.location" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+          <span v-else>{{item.location}}</span>
+        </template>
+
+        <template v-slot:[`item.actions`]="{ item }">
+          <div v-if="item._id === editedItem._id">
+            <v-icon color="red" class="mr-3" @click="close" title="Cancel">
+              mdi-window-close
+            </v-icon>
+            <v-icon color="green"  @click="save" title="Save">
+              mdi-content-save
+            </v-icon>
           </div>
-        </v-toolbar>
-      </template>
+          <div v-else>
+            <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
+              mdi-pencil
+            </v-icon>
+            <v-icon color="red" @click="deleteItem(item)" title="Delete">
+              mdi-delete
+            </v-icon>
+          </div>
+        </template>
+        <template v-slot:no-data>
+          <v-btn color="primary" @click="getAll">Reset</v-btn>
+        </template>
 
-      <template v-slot:[`item.productimage`]="{ item }">
-        <v-file-input v-if="item._id === editedItem._id"
-          v-model="editedItem.productimage"
-          :hide-details="true"
-          dense
-          single-line
-          :autofocus="true"
-          accept="image/*"
-          show-size
-          prepend-icon="mdi-camera"
-          @change="uploadImage"
-        ></v-file-input>
-        <span v-else>
-          <v-img
-            lazy-src="https://picsum.photos/id/11/10/6"
-            max-height="50"
-            max-width="50"
-            :src="item.productimage"
-          ></v-img>
-        </span>
-      </template>
-
-      <template v-slot:[`item.price`]="{ item }">
-        <v-text-field v-model="editedItem.price" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
-        <span v-else>{{item.price}}</span>
-      </template>
-
-      <template v-slot:[`item.title`]="{ item }">
-        <v-text-field v-model="editedItem.title" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
-        <span v-else>{{item.title}}</span>
-      </template>
-
-      <template v-slot:[`item.description`]="{ item }">
-        <v-text-field v-model="editedItem.description" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
-        <span v-else>{{item.description}}</span>
-      </template>
-
-      <template v-slot:[`item.location`]="{ item }">
-        <v-text-field v-model="editedItem.location" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
-        <span v-else>{{item.location}}</span>
-      </template>
-
-      <template v-slot:[`item.actions`]="{ item }">
-        <div v-if="item._id === editedItem._id">
-          <v-icon color="red" class="mr-3" @click="close" title="Cancel">
-            mdi-window-close
-          </v-icon>
-          <v-icon color="green"  @click="save" title="Save">
-            mdi-content-save
-          </v-icon>
-        </div>
-        <div v-else>
-          <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
-            mdi-pencil
-          </v-icon>
-          <v-icon color="red" @click="deleteItem(item)" title="Delete">
-            mdi-delete
-          </v-icon>
-        </div>
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="getAll">Reset</v-btn>
-      </template>
-
-    </v-data-table>
-
+      </v-data-table>
+    </v-row>
   </v-container>
 </template>
 
