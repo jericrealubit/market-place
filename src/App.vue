@@ -1,7 +1,7 @@
 <template>
   <v-app>
 
-    <UserLogin @logged-user="setLoggedUser" />
+    <!-- <UserLogin @logged-user="setLoggedUser" /> -->
 
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
@@ -17,7 +17,8 @@
         <v-row no-gutters>
           <v-col>
 
-            <ProfileList />
+            <!-- <ProfileList /> -->
+            <PostList />
 
           </v-col>
           <v-col>
@@ -48,11 +49,12 @@
 </template>
 
 <script>
-  import ProfileList from "./components/ProfileList.vue"
+  // import ProfileList from "./components/ProfileList.vue"
   import UploadImage from "./components/UploadImage.vue"
-  import UserLogin from "./components/UserLogin.vue"
+  // import UserLogin from "./components/UserLogin.vue"
+  import PostList from "./components/PostList.vue"
   export default {
-    components: { ProfileList, UploadImage, UserLogin },
+    components: { UploadImage, PostList },
     name: 'App',
 
     data: () => ({

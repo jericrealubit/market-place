@@ -169,6 +169,7 @@
               && element.password == this.loginFormValue.loginPassword
             ) {
               this.loggedUser = element.firstname + " " + element.lastname;
+              localStorage.useremail = element.email; // use localStorage to save username 
             }
           });
           if (this.loggedUser) {

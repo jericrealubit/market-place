@@ -28,33 +28,37 @@
               color="primary"
               class="ml-2 white--text"
               @click="addNew">
-              <v-icon dark>mdi-account-plus-outline</v-icon>Add
+              <v-icon dark>mdi-storefront-plus</v-icon>Add
             </v-btn>
           </div>
         </v-toolbar>
       </template>
 
-      <template v-slot:[`item.username`]="{ item }">
-        <v-text-field v-model="editedItem.username" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field>
-        <span v-else>{{item.username}}</span>
+      <template v-slot:[`item.productimage`]="{ item }">
+        <v-text-field v-model="editedItem.productimage" :hide-details="true" dense single-line :autofocus="true" v-if="item._id === editedItem._id"></v-text-field>
+        <span v-else>{{item.productimage}}</span>
       </template>
 
-      <template v-slot:[`item.email`]="{ item }">
-        <v-text-field v-model="editedItem.email" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-        <span v-else>{{item.email}}</span>
+      <template v-slot:[`item.price`]="{ item }">
+        <v-text-field v-model="editedItem.price" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+        <span v-else>{{item.price}}</span>
       </template>
 
-      <template v-slot:[`item.imageUrl`]="{ item }">
-        <v-text-field v-model="editedItem.imageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-        <img v-else :src="item.imageUrl" style="width: 50px; height: 50px" />
+      <template v-slot:[`item.title`]="{ item }">
+        <v-text-field v-model="editedItem.title" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+        <span v-else>{{item.title}}</span>
       </template>
 
-      <template v-slot:[`item.multipleImageUrl`]="{ item }">
-        <v-text-field v-model="editedItem.multipleImageUrl" :hide-details="true" dense single-line v-if="item._id === editedItem._id" ></v-text-field>
-        <div v-else v-html="showImage(item.multipleImageUrl)"></div>
+      <template v-slot:[`item.description`]="{ item }">
+        <v-text-field v-model="editedItem.description" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+        <span v-else>{{item.description}}</span>
       </template>
 
-      <!-- actions -->
+      <template v-slot:[`item.location`]="{ item }">
+        <v-text-field v-model="editedItem.location" :hide-details="true" dense single-line v-if="item._id === editedItem._id"></v-text-field>
+        <span v-else>{{item.location}}</span>
+      </template>
+
       <template v-slot:[`item.actions`]="{ item }">
         <div v-if="item._id === editedItem._id">
           <v-icon color="red" class="mr-3" @click="close" title="Cancel">
@@ -83,9 +87,9 @@
 </template>
 
 <script>
-  const api = "https://rest-api-express-mongodb.netlify.app/.netlify/functions/api/"
+  const api = "https://api-posts-jeric.netlify.app/.netlify/functions/api/"
   export default {
-    name: 'ProfileList',
+    name: 'PostsList',
 
     data: () => ({
       msg: '',
@@ -102,10 +106,11 @@
         multipleImageUrl: ''
       },
       headTitle: [
-        { text: "Username", value: "username" },
-        { text: "Email", value: "email" },
-        { text: "Images", value: "imageUrl" },
-        { text: "Multiple Images", value: "multipleImageUrl" },
+        { text: "Image", value: "productimage" },
+        { text: "Price", value: "price" },
+        { text: "Title", value: "title" },
+        { text: "Description", value: "description" },
+        { text: "Location", value: "location" },
         { text: "Actions", value: "actions" },
       ],
       editedIndex: -1,
@@ -116,10 +121,11 @@
         imageUrl: ''
       },
       defaultItem: {
-        username: '',
-        email: '',
-        multipleImageUrl: '',
-        imageUrl: ''
+        productimage: '',
+        price: '',
+        title: '',
+        description: '',
+        location: '',
       }
     }),
     methods: {
