@@ -119,12 +119,6 @@
       showPassword: false,
       profiles: [],
       id: "", // id to update PUT:id, was set by GET:id
-      formValues: {
-        username: '',
-        email: '',
-        imageUrl: '',
-        multipleImageUrl: ''
-      },
       headTitle: [
         { text: "Item", value: "productimage" },
         { text: "Price", value: "price" },
@@ -133,12 +127,20 @@
         { text: "Location", value: "location" },
         { text: "Actions", value: "actions" },
       ],
+      formValues: {
+        productimage: '',
+        price: '',
+        title: '',
+        description: '',
+        location: '',
+      },
       editedIndex: -1,
       editedItem: {
-        username: '',
-        email: '',
-        multipleImageUrl: '',
-        imageUrl: ''
+        productimage: '',
+        price: '',
+        title: '',
+        description: '',
+        location: '',
       },
       defaultItem: {
         productimage: '',
@@ -214,10 +216,10 @@
       },
       save() {
         if (this.editedIndex > -1) {
-          this.formValues.username = this.editedItem.username
-          this.formValues.email = this.editedItem.email
-          this.formValues.imageUrl = this.editedItem.imageUrl
-          this.formValues.multipleImageUrl = this.editedItem.multipleImageUrl
+          this.formValues.price = this.editedItem.price
+          this.formValues.title = this.editedItem.title
+          this.formValues.description = this.editedItem.description
+          this.formValues.location = this.editedItem.location
           Object.assign(this.profiles[this.editedIndex], this.editedItem)
           let fetchApi = (this.id) ? (api + this.id) : api;
           let fetchMethod = (this.id) ? "PUT" : "POST";
@@ -256,6 +258,7 @@
             console.log(response);
             console.log(response.data.data.url) // image url
             this.uploadedImage = response.data.data.url; // assign to data property
+            this.formValues.productimage = response.data.data.url;
           })
           .catch((err) => {
           console.log("API error ↓");
