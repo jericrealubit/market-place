@@ -13,7 +13,6 @@
         md="3"
         xl="2"
       >
-
         <v-card
             :loading="loading"
             class="mx-auto my-1"

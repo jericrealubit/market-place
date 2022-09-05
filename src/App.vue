@@ -1,7 +1,7 @@
 <template>
   <v-app>
 
-    <!-- <UserLogin @logged-user="setLoggedUser" /> -->
+    <UserLogin @logged-user="setLoggedUser" />
 
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
@@ -9,6 +9,9 @@
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
+      <v-btn text rounded @click="logout">
+        <v-icon small>mdi-logout</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <!-- main -->
@@ -21,7 +24,7 @@
             <PostList />
 
           </v-col>
-          
+
         </v-row>
       </v-container>
     </v-main>
@@ -47,18 +50,29 @@
 <script>
   // import ProfileList from "./components/ProfileList.vue"
   // import UploadImage from "./components/UploadImage.vue"
-  // import UserLogin from "./components/UserLogin.vue"
+  import UserLogin from "./components/UserLogin.vue"
   import PostList from "./components/PostList.vue"
   export default {
-    components: { PostList },
+    components: { PostList, UserLogin },
     name: 'App',
 
     data: () => ({
       loggedUser: "guest"
     }),
     methods: {
+      logout() {
+        localStorage.removeItem("loggedUser");
+        this.$forceUpdate();
+        console.log("logged-out")
+      },
       setLoggedUser(loggedInUser) {
+        this.loggedUser =  "guest";
         this.loggedUser = loggedInUser;
+      }
+    },
+    mounted() {
+      if (localStorage.loggedUser) {
+        this.loggedUser = localStorage.loggedUser
       }
     }
   };
