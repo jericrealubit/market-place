@@ -179,6 +179,7 @@
             console.log("login successful")
             this.dialog = false;
             this.$emit("logged-user", this.loggedUser);
+            document.location.reload(true); // force page reload to show admin table
           } else {
             console.log("login failed")
           }
