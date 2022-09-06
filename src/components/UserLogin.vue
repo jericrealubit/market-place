@@ -22,10 +22,12 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
+                        autofocus
                         v-model="loginFormValue.loginEmail"
                         :rules="loginEmailRules"
                         label="E-mail"
                         required
+                        @focus="hideLoginErrorMsg"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12">
@@ -40,9 +42,17 @@
                         counter
                         @click:append="show1 = !show1"
                         @keyup.enter="login"
+                        @focus="hideLoginErrorMsg"
                       ></v-text-field>
                     </v-col>
-                    <v-col class="d-flex" cols="12" sm="6" xsm="12"> </v-col>
+                    <v-col
+                      class="d-flex"
+                      cols="12"
+                      sm="6"
+                      xsm="12"
+                      style="color: red"
+                      ><div v-if="isLoginError">{{ loginErrorMsg }}</div></v-col
+                    >
                     <v-spacer></v-spacer>
                     <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
                       <v-btn
@@ -71,6 +81,7 @@
                   <v-row>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
+                        autofocus
                         v-model="formValues.firstname"
                         :rules="[rules.required]"
                         label="First Name"
@@ -93,6 +104,7 @@
                         :rules="emailRules"
                         label="E-mail"
                         required
+                        @focus="hideEmailErrorMsg"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12">
@@ -121,6 +133,14 @@
                         @click:append="show1 = !show1"
                       ></v-text-field>
                     </v-col>
+                    <v-col
+                      class="d-flex"
+                      cols="12"
+                      sm="6"
+                      xsm="12"
+                      style="color: red"
+                      ><div v-if="isEmailError">{{ emailErrorMsg }}</div></v-col
+                    >
                     <v-spacer></v-spacer>
                     <v-col class="d-flex ml-auto" cols="12" sm="3" xsm="12">
                       <v-btn
@@ -144,55 +164,67 @@
 </template>
 
 <script>
-  const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
-  export default {
-    name: "UserLogin",
-    data: () => ({
-      loggedUser: "",
-      users: [],
-      dialog: true,
-      tab: 0,
-      tabs: [
-        { name: "Login", icon: "mdi-account" },
-        { name: "Register", icon: "mdi-account-outline" },
-      ],
-      isFormValid: true,
-      formValues: {
-        firstname: "",
-        lastname: "",
-        email: "",
-        password: "",
-      },
-      loginFormValue: {
-        loginEmail: "",
-        loginPassword: "",
-      },
-      verify: "",
-      loginEmailRules: [
-        (v) => !!v || "Required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-      ],
-      emailRules: [
-        (v) => !!v || "Required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-      ],
-
-      show1: false,
-      rules: {
-        required: (value) => !!value || "Required.",
-        min: (v) => (v && v.length >= 8) || "Min 8 characters",
-      },
-    }),
-    computed: {
-      passwordMatch() {
-        return () =>
-          this.formValues.password === this.verify || "Password must match";
-      },
+const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
+export default {
+  name: "UserLogin",
+  data: () => ({
+    isEmailError: false,
+    emailErrorMsg: "Email is already taken",
+    isLoginError: false,
+    loginErrorMsg: "Email or Password does not match",
+    loggedUser: "",
+    users: [],
+    dialog: true,
+    tab: 0,
+    tabs: [
+      { name: "Login", icon: "mdi-account" },
+      { name: "Register", icon: "mdi-account-outline" },
+    ],
+    isFormValid: true,
+    formValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
     },
-    methods: {
-      register() {
-        let validform = this.$refs.registerForm.validate();
-        if (validform) {
+    loginFormValue: {
+      loginEmail: "",
+      loginPassword: "",
+    },
+    verify: "",
+    loginEmailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    emailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+
+    show1: false,
+    rules: {
+      required: (value) => !!value || "Required.",
+      min: (v) => (v && v.length >= 8) || "Min 8 characters",
+    },
+  }),
+  computed: {
+    passwordMatch() {
+      return () =>
+        this.formValues.password === this.verify || "Password must match";
+    },
+  },
+  methods: {
+    register() {
+      let validform = this.$refs.registerForm.validate();
+      if (validform) {
+        // check email from database
+        this.users.forEach((element) => {
+          if (element.email == this.formValues.email) {
+            this.isEmailError = true;
+          }
+        });
+
+        if (!this.isEmailError) {
           fetch(apiUsers, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -210,48 +242,56 @@
               if (err) throw err;
             });
         }
-      },
-      login() {
-        let validform = this.$refs.loginForm.validate();
-        if (validform) {
-          // verify login details
-          this.users.forEach((element) => {
-            if (
-              element.email == this.loginFormValue.loginEmail &&
-              element.password == this.loginFormValue.loginPassword
-            ) {
-              this.loggedUser = element.firstname + " " + element.lastname;
-              // localStorage
-              localStorage.userId = element._id;
-              localStorage.loggedUser = this.loggedUser;
-            }
-          });
-          if (this.loggedUser) {
-            console.log("login successful");
-            this.dialog = false;
-            this.$emit("logged-user", this.loggedUser);
-            document.location.reload(true); // force page reload to show admin table
-          } else {
-            console.log("login failed");
-          }
-        }
-      },
-    },
-    mounted() {
-      // check if user is logged-in, do not show login form
-      if (localStorage.loggedUser) {
-        this.dialog = false;
       }
-
-      // get all users
-      fetch(apiUsers)
-        .then((response) => response.json())
-        .then((data) => {
-          this.users = data;
-        })
-        .catch((err) => {
-          if (err) throw err;
-        });
     },
-  };
+    login() {
+      let validform = this.$refs.loginForm.validate();
+      if (validform) {
+        // verify login details
+        this.users.forEach((element) => {
+          if (
+            element.email == this.loginFormValue.loginEmail &&
+            element.password == this.loginFormValue.loginPassword
+          ) {
+            this.loggedUser = element.firstname + " " + element.lastname;
+            // localStorage
+            localStorage.userId = element._id;
+            localStorage.loggedUser = this.loggedUser;
+          }
+        });
+        if (this.loggedUser) {
+          console.log("login successful");
+          this.dialog = false;
+          this.$emit("logged-user", this.loggedUser);
+          document.location.reload(true); // force page reload to show admin table
+        } else {
+          console.log("login failed");
+          this.isLoginError = true;
+        }
+      }
+    },
+    hideLoginErrorMsg() {
+      this.isLoginError = false;
+    },
+    hideEmailErrorMsg() {
+      this.isEmailError = false;
+    }
+  },
+  mounted() {
+    // check if user is logged-in, do not show login form
+    if (localStorage.loggedUser) {
+      this.dialog = false;
+    }
+
+    // get all users
+    fetch(apiUsers)
+      .then((response) => response.json())
+      .then((data) => {
+        this.users = data;
+      })
+      .catch((err) => {
+        if (err) throw err;
+      });
+  },
+};
 </script>
