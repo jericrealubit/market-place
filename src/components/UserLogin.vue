@@ -131,6 +131,7 @@
                         label="Confirm Password"
                         counter
                         @click:append="show1 = !show1"
+                        @keyup.enter="register"
                       ></v-text-field>
                     </v-col>
                     <v-col
