@@ -9,7 +9,7 @@
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn text rounded @click="logout">
+      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout">
         <v-icon small>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
