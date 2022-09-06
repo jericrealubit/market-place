@@ -59,7 +59,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="formValues.user_id">
       <!-- message -->
       <v-card>
         <v-card-text class="pl-10 pb-0">
@@ -192,6 +192,7 @@
         title: '',
         description: '',
         location: '',
+        user_id: '',
       },
       editedIndex: -1,
       editedItem: {
@@ -335,6 +336,9 @@
     },
     mounted() {
       this.getAll();
+      if (localStorage.userId) { // set user_id
+        this.formValues.user_id = localStorage.userId
+      }
     },
   }
 </script>

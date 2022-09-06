@@ -1,7 +1,7 @@
 <template>
   <v-app>
 
-    <UserLogin @logged-user="setLoggedUser" />
+    <UserLogin @logged-user="setLoggedUser" v-if=loginform />
 
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
@@ -9,8 +9,11 @@
       <v-spacer></v-spacer>
       <v-btn text rounded>Home</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout">
+      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout" title="logout">
         <v-icon small>mdi-logout</v-icon>
+      </v-btn>
+      <v-btn v-else text rounded @click="login" title="login">
+        <v-icon small>mdi-login</v-icon>
       </v-btn>
     </v-app-bar>
 
@@ -55,18 +58,21 @@
   export default {
     components: { PostList, UserLogin },
     name: 'App',
-
     data: () => ({
-      loggedUser: "guest"
+      loggedUser: "guest",
+      loginform: false
     }),
     methods: {
       logout() {
         localStorage.removeItem("loggedUser");
+        localStorage.removeItem("userId");
         document.location.reload(true); // force page reload
       },
       setLoggedUser(loggedInUser) {
-        this.loggedUser =  "guest";
         this.loggedUser = loggedInUser;
+      },
+      login() {
+        this.loginform = true;
       }
     },
     mounted() {
