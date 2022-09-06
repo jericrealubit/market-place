@@ -254,9 +254,8 @@
           .then((response) => response.json())
           .then((data) => {
             // filter data to show only post that match the user_id
-            console.log(data);
-            let postData = [];
             if (localStorage.userId) {
+              let postData = [];
               data.forEach((element) => {
                 if (localStorage.userId == element.user_id) {
                   postData.push(element);
