@@ -235,9 +235,12 @@ export default {
             .then((data) => {
               console.log(data);
               this.dialog = false;
-              this.loggedUser =
-                this.formValues.firstname + " " + this.formValues.lastname;
+              this.loggedUser = this.formValues.firstname + " " + this.formValues.lastname;
+              // localStorage
+              localStorage.userId = data; // inserted document id
+              localStorage.loggedUser = this.loggedUser;
               this.$emit("logged-user", this.loggedUser);
+              document.location.reload(true); // force page reload to show admin table
             })
             .catch((err) => {
               if (err) throw err;
