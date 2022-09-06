@@ -101,7 +101,6 @@
             dense
             single-line
             :autofocus="true"
-            accept="image/*"
             show-size
             prepend-icon="mdi-camera"
             @change="uploadImage"
@@ -229,6 +228,7 @@
         title: "",
         description: "",
         location: "",
+        user_id: "",
       },
       defaultItem: {
         productimage: "",
@@ -236,6 +236,7 @@
         title: "",
         description: "",
         location: "",
+        user_id: "",
       },
     }),
     methods: {
