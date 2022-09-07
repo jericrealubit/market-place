@@ -1,8 +1,38 @@
 <template>
   <v-container>
-    <v-row>
+    <!-- details -->
+    <v-dialog v-model="detailsDialog">
+      <v-card class="mx-auto" max-width="400">
+        <v-img
+          class="white--text align-end"
+          height="200px"
+          :src="details.productimage"
+        >
+          <v-card-title
+            >$ {{ details.price }} - {{ details.title }}</v-card-title
+          >
+        </v-img>
 
-      <v-progress-linear v-if="postsLoading" indeterminate color="cyan"></v-progress-linear>
+        <v-card-subtitle class="pb-0">{{ details.location }}</v-card-subtitle>
+
+        <v-card-text class="text--primary">
+          <div>{{ details.description }}</div>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="orange" text> Share </v-btn>
+
+          <v-btn color="orange" text> Explore </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-row>
+      <v-progress-linear
+        v-if="postsLoading"
+        indeterminate
+        color="cyan"
+      ></v-progress-linear>
 
       <v-col
         v-for="(post, n) in posts"
@@ -14,7 +44,13 @@
         md="3"
         xl="2"
       >
-        <v-card :loading="loading" class="mx-auto my-1">
+        <v-card
+          :loading="loading"
+          class="mx-auto my-1"
+          id="card"
+          title="View Details"
+          @click="showDetails(post._id)"
+        >
           <template slot="progress">
             <v-progress-linear
               color="deep-purple"
@@ -194,212 +230,250 @@
 </template>
 
 <script>
-const axios = require("axios");
-const formData = require("form-data");
-const api = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
-export default {
-  name: "PostsList",
+  const axios = require("axios");
+  const formData = require("form-data");
+  const api = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
+  export default {
+    name: "PostsList",
 
-  data: () => ({
-    postsLoading: true,
-    msg: "",
-    add: true,
-    search: "",
-    loading: true,
-    showPassword: false,
-    posts: [],
-    id: "", // id to update PUT:id, was set by GET:id
-    headTitle: [
-      { text: "Item", value: "productimage" },
-      { text: "Price", value: "price" },
-      { text: "Title", value: "title" },
-      { text: "Description", value: "description" },
-      { text: "Location", value: "location" },
-      { text: "Actions", value: "actions" },
-    ],
-    formValues: {
-      productimage: "",
-      price: "",
-      title: "",
-      description: "",
-      location: "",
-      user_id: "",
-    },
-    editedIndex: -1,
-    editedItem: {
-      productimage: "",
-      price: "",
-      title: "",
-      description: "",
-      location: "",
-      user_id: "",
-    },
-    defaultItem: {
-      productimage: "",
-      price: "",
-      title: "",
-      description: "",
-      location: "",
-      user_id: "",
-    },
-  }),
-  methods: {
-    showImage(imageUrls) {
-      let urls = "";
-      if (imageUrls) {
-        const imgArr = imageUrls.split(",");
-        imgArr.forEach((element) => {
-          urls += `<img src="${element}" width="50">`;
-        });
-      }
-      return urls;
-    },
-    getAll() {
-      fetch(api)
-        .then((response) => response.json())
-        .then((data) => {
-          // filter data to show only post that match the user_id
-          if (localStorage.userId) {
-            let postData = [];
-            data.forEach((element) => {
-              if (localStorage.userId == element.user_id) {
-                postData.push(element);
+    data: () => ({
+      details: {
+        productimage: "",
+        price: "",
+        title: "",
+        description: "",
+        location: "",
+        user_id: "",
+      },
+      detailsDialog: false,
+      postsLoading: true,
+      msg: "",
+      add: true,
+      search: "",
+      loading: true,
+      showPassword: false,
+      posts: [],
+      id: "", // id to update PUT:id, was set by GET:id
+      headTitle: [
+        { text: "Item", value: "productimage" },
+        { text: "Price", value: "price" },
+        { text: "Title", value: "title" },
+        { text: "Description", value: "description" },
+        { text: "Location", value: "location" },
+        { text: "Actions", value: "actions" },
+      ],
+      formValues: {
+        productimage: "",
+        price: "",
+        title: "",
+        description: "",
+        location: "",
+        user_id: "",
+      },
+      editedIndex: -1,
+      editedItem: {
+        productimage: "",
+        price: "",
+        title: "",
+        description: "",
+        location: "",
+        user_id: "",
+      },
+      defaultItem: {
+        productimage: "",
+        price: "",
+        title: "",
+        description: "",
+        location: "",
+        user_id: "",
+      },
+    }),
+    methods: {
+      showImage(imageUrls) {
+        let urls = "";
+        if (imageUrls) {
+          const imgArr = imageUrls.split(",");
+          imgArr.forEach((element) => {
+            urls += `<img src="${element}" width="50">`;
+          });
+        }
+        return urls;
+      },
+      getAll() {
+        fetch(api)
+          .then((response) => response.json())
+          .then((data) => {
+            // filter data to show only post that match the user_id
+            if (localStorage.userId) {
+              let postData = [];
+              data.forEach((element) => {
+                if (localStorage.userId == element.user_id) {
+                  postData.push(element);
+                }
+              });
+              this.posts = postData;
+            } else {
+              this.posts = data;
+            }
+            this.postsLoading = false;
+            this.loading = false;
+          })
+          .catch((err) => {
+            if (err) throw err;
+          });
+      },
+      editItem(item) {
+        this.editedIndex = this.posts.indexOf(item);
+        this.editedItem = Object.assign({}, item);
+        this.id = item._id;
+        this.add = false;
+      },
+      deleteItem(item) {
+        if (confirm("Are you sure you want to delete this item?")) {
+          const index = this.posts.indexOf(item);
+          this.posts.splice(index, 1);
+          fetch(api + item._id, {
+            method: "DELETE",
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              this.msg = data;
+              this.getAll();
+            })
+            .catch((err) => {
+              if (err) throw err;
+            });
+          console.log("confirm delete");
+        } else {
+          console.log("cancel delete");
+        }
+      },
+      close() {
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+          if (this.add) {
+            this.posts.shift(this.editedItem);
+            this.editItem(this.editedItem);
+          }
+        }, 300);
+      },
+      addNew() {
+        const addObj = Object.assign({}, this.defaultItem);
+        this.posts.unshift(addObj);
+        this.editItem(addObj);
+        this.add = true;
+      },
+      save() {
+        if (this.editedIndex > -1) {
+          this.formValues.price = this.editedItem.price;
+          this.formValues.title = this.editedItem.title;
+          this.formValues.description = this.editedItem.description;
+          this.formValues.location = this.editedItem.location;
+          Object.assign(this.posts[this.editedIndex], this.editedItem);
+          let fetchApi = this.id ? api + this.id : api;
+          let fetchMethod = this.id ? "PUT" : "POST";
+          fetch(fetchApi, {
+            method: fetchMethod,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.formValues),
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              this.msg = data;
+              this.getAll();
+            })
+            .catch((err) => {
+              if (err) throw err;
+            });
+        }
+        this.close();
+      },
+      uploadImage(event) {
+        try {
+          console.log("ping !");
+          const bodyFormData = new formData();
+          bodyFormData.append("image", event); // event = is our image object
+
+          const apiUrl = "https://api.imgbb.com/1/upload";
+          const apiKey = "bdcadd576cf26e4fe1f31de4594ca4fd";
+          axios({
+            method: "POST",
+            url: apiUrl + "?key=" + apiKey,
+            data: bodyFormData,
+            header: { "Content-Type": "multipart/form-data" },
+          })
+            .then((response) => {
+              console.log("API response ↓");
+              console.log(response);
+              console.log(response.data.data.url); // image url
+              this.uploadedImage = response.data.data.url; // assign to data property
+              this.formValues.productimage = response.data.data.url;
+            })
+            .catch((err) => {
+              console.log("API error ↓");
+              console.log(err);
+
+              if (err.response.data.error) {
+                console.log(err.response.data.error);
+                //When trouble shooting, simple informations about the error can be found in err.response.data.error so it's good to display it
               }
             });
-            this.posts = postData;
-          } else {
-            this.posts = data;
-          }
-          this.postsLoading = false
-          this.loading = false;
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      showDetails(post_id) {
+        console.log(post_id);
+        //
+
+        fetch(api + post_id, {
+          method: "GET",
         })
-        .catch((err) => {
-          if (err) throw err;
-        });
-    },
-    editItem(item) {
-      this.editedIndex = this.posts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.id = item._id;
-      this.add = false;
-    },
-    deleteItem(item) {
-      if (confirm("Are you sure you want to delete this item?")) {
-        const index = this.posts.indexOf(item);
-        this.posts.splice(index, 1);
-        fetch(api + item._id, {
-          method: "DELETE",
-        })
-          .then((response) => response.text())
+          .then((response) => response.json())
           .then((data) => {
-            this.msg = data;
-            this.getAll();
+            console.log(data);
+            this.details.productimage = data.productimage;
+            this.details.price = data.price;
+            this.details.title = data.title;
+            this.details.description = data.description;
+            this.details.location = data.location;
+            this.details.user_id = data.user_id;
+            console.log(this.details);
           })
           .catch((err) => {
             if (err) throw err;
           });
         console.log("confirm delete");
-      } else {
-        console.log("cancel delete");
-      }
-    },
-    close() {
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-        if (this.add) {
-          this.posts.shift(this.editedItem);
-          this.editItem(this.editedItem);
-        }
-      }, 300);
-    },
-    addNew() {
-      const addObj = Object.assign({}, this.defaultItem);
-      this.posts.unshift(addObj);
-      this.editItem(addObj);
-      this.add = true;
-    },
-    save() {
-      if (this.editedIndex > -1) {
-        this.formValues.price = this.editedItem.price;
-        this.formValues.title = this.editedItem.title;
-        this.formValues.description = this.editedItem.description;
-        this.formValues.location = this.editedItem.location;
-        Object.assign(this.posts[this.editedIndex], this.editedItem);
-        let fetchApi = this.id ? api + this.id : api;
-        let fetchMethod = this.id ? "PUT" : "POST";
-        fetch(fetchApi, {
-          method: fetchMethod,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(this.formValues),
-        })
-          .then((response) => response.text())
-          .then((data) => {
-            this.msg = data;
-            this.getAll();
-          })
-          .catch((err) => {
-            if (err) throw err;
-          });
-      }
-      this.close();
-    },
-    uploadImage(event) {
-      try {
-        console.log("ping !");
-        const bodyFormData = new formData();
-        bodyFormData.append("image", event); // event = is our image object
 
-        const apiUrl = "https://api.imgbb.com/1/upload";
-        const apiKey = "bdcadd576cf26e4fe1f31de4594ca4fd";
-        axios({
-          method: "POST",
-          url: apiUrl + "?key=" + apiKey,
-          data: bodyFormData,
-          header: { "Content-Type": "multipart/form-data" },
-        })
-          .then((response) => {
-            console.log("API response ↓");
-            console.log(response);
-            console.log(response.data.data.url); // image url
-            this.uploadedImage = response.data.data.url; // assign to data property
-            this.formValues.productimage = response.data.data.url;
-          })
-          .catch((err) => {
-            console.log("API error ↓");
-            console.log(err);
-
-            if (err.response.data.error) {
-              console.log(err.response.data.error);
-              //When trouble shooting, simple informations about the error can be found in err.response.data.error so it's good to display it
-            }
-          });
-      } catch (error) {
-        console.log(error);
+        this.detailsDialog = true;
+      },
+    },
+    mounted() {
+      this.getAll();
+      if (localStorage.userId) {
+        // set user_id
+        this.formValues.user_id = localStorage.userId;
       }
     },
-  },
-  mounted() {
-    this.getAll();
-    if (localStorage.userId) {
-      // set user_id
-      this.formValues.user_id = localStorage.userId;
-    }
-  },
-};
+  };
 </script>
 
 <style scoped>
-/* striped */
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.05);
-}
+  #card {
+    cursor: pointer;
+  }
 
-.v-btn:not(.v-btn--round).v-size--default {
-  height: auto;
-}
+  /* striped */
+  tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 
-.w-100 {
-  width: 100%;
-}
+  .v-btn:not(.v-btn--round).v-size--default {
+    height: auto;
+  }
+
+  .w-100 {
+    width: 100%;
+  }
 </style>
