@@ -6,17 +6,17 @@
         <v-img
           class="white--text align-end"
           height="200px"
-          src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          :src="details.productimage"
         >
-          <v-card-title>Top 10 Australian beaches</v-card-title>
+          <v-card-title
+            >$ {{ details.price }} - {{ details.title }}</v-card-title
+          >
         </v-img>
 
-        <v-card-subtitle class="pb-0"> Number 10 </v-card-subtitle>
+        <v-card-subtitle class="pb-0">{{ details.location }}</v-card-subtitle>
 
         <v-card-text class="text--primary">
-          <div>Whitehaven Beach</div>
-
-          <div>Whitsunday Island, Whitsunday Islands</div>
+          <div>{{ details.description }}</div>
         </v-card-text>
 
         <v-card-actions>
@@ -237,6 +237,14 @@
     name: "PostsList",
 
     data: () => ({
+      details: {
+        productimage: "",
+        price: "",
+        title: "",
+        description: "",
+        location: "",
+        user_id: "",
+      },
       detailsDialog: false,
       postsLoading: true,
       msg: "",
@@ -417,6 +425,27 @@
       },
       showDetails(post_id) {
         console.log(post_id);
+        //
+
+        fetch(api + post_id, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            this.details.productimage = data.productimage;
+            this.details.price = data.price;
+            this.details.title = data.title;
+            this.details.description = data.description;
+            this.details.location = data.location;
+            this.details.user_id = data.user_id;
+            console.log(this.details);
+          })
+          .catch((err) => {
+            if (err) throw err;
+          });
+        console.log("confirm delete");
+
         this.detailsDialog = true;
       },
     },
