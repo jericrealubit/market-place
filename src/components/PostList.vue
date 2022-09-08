@@ -87,6 +87,7 @@
           outlined
           label="Please type your message to the seller"
           class="pa-5"
+          @keyup.enter="sendMsgToSeller"
         >
         </v-textarea>
 
@@ -107,6 +108,7 @@
               class="px-5 py-2 ma-3 float-right mr-5"
               title="send message"
               :disabled="messageToSeller.length ? false : true"
+              @click="sendMsgToSeller"
             >
               <v-icon class="pr-2">mdi-message-text-outline</v-icon>
               Send Message
@@ -400,6 +402,10 @@
       },
     },
     methods: {
+      sendMsgToSeller() {
+        console.log(this.messageToSeller);
+        this.detailsDialog = false;
+      },
       appendMessageToSeller(msg) {
         this.messageToSeller += msg;
         document.getElementById("messageToSeller").focus();
@@ -545,15 +551,10 @@
         }
       },
       showDetails(post_id) {
-        //this.resetDetails();
-        let data = this.postsData[post_id];
-        //console.log(data.productimage);
+        // clear message to seller
+        this.messageToSeller = "";
 
-        // fetch(api + post_id, {
-        //   method: "GET",
-        // })
-        //   .then((response) => response.json())
-        //   .then((data) => {
+        let data = this.postsData[post_id];
 
         this.details.productimage = data.productimage;
         this.details.price = data.price;
@@ -563,24 +564,10 @@
         this.details.user_id = data.user_id;
 
         this.sellerName = this.usersNames[data.user_id];
-
-        // })
-        // .catch((err) => {
-        //   if (err) throw err;
-        // });
-
         this.detailsDialog = true;
       },
       detailClose() {
         this.detailsDialog = false;
-      },
-      resetDetails() {
-        this.details.productimage = "";
-        this.details.price = "";
-        this.details.title = "";
-        this.details.description = "";
-        this.details.location = "";
-        this.details.user_id = "";
       },
     },
     mounted() {
