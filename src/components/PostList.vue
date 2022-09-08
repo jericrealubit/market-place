@@ -44,30 +44,46 @@
 
         <v-layout wrap>
           <v-flex>
-            <v-btn rounded class="float-right px-2 py-1 ma-1"
+            <v-btn
+              rounded
+              class="float-right px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` I'm interested in this item. `)"
               >I'm interested in this item.</v-btn
             >
           </v-flex>
           <v-flex>
-            <v-btn rounded class="float-left px-2 py-1 ma-1"
+            <v-btn
+              rounded
+              class="float-left px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` Is this item still available? `)"
               >Is this item still available?</v-btn
             >
           </v-flex>
         </v-layout>
         <v-layout wrap>
           <v-flex>
-            <v-btn rounded class="float-right px-2 py-1 ma-1"
+            <v-btn
+              rounded
+              class="float-right px-2 py-1 ma-1"
+              @click="
+                appendMessageToSeller(` What condition is this item in? `)
+              "
               >What condition is this item in?</v-btn
             >
           </v-flex>
           <v-flex>
-            <v-btn rounded class="float-left px-2 py-1 ma-1"
+            <v-btn
+              rounded
+              class="float-left px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` Do you deliver? `)"
               >Do you deliver?</v-btn
             >
           </v-flex>
         </v-layout>
 
         <v-textarea
+          id="messageToSeller"
+          v-model="messageToSeller"
           outlined
           label="Please type your message to the seller"
           class="pa-5"
@@ -76,9 +92,25 @@
 
         <v-divider></v-divider>
         <v-layout>
-          <v-flex class="float-right">
-            <v-btn>Cancel</v-btn>
-            <v-btn>Send Message</v-btn>
+          <v-flex>
+            <v-btn
+              class="px-5 py-2 ma-3 ml-5 float-left"
+              @click="detailClose"
+              title="cancel"
+            >
+              <v-icon class="pr-2">mdi-message-off</v-icon>
+              Cancel
+            </v-btn>
+          </v-flex>
+          <v-flex>
+            <v-btn
+              class="px-5 py-2 ma-3 float-right mr-5"
+              title="send message"
+              :disabled="messageToSeller.length ? false : true"
+            >
+              <v-icon class="pr-2">mdi-message-text-outline</v-icon>
+              Send Message
+            </v-btn>
           </v-flex>
         </v-layout>
       </v-card>
@@ -138,7 +170,7 @@
               {{ post.title }}
             </div>
 
-            <div>{{ post.description }}</div>
+            <!-- <div>{{ post.description }}</div> -->
             <div>{{ post.location }}</div>
           </v-card-text>
         </v-card>
@@ -297,6 +329,7 @@
     name: "PostsList",
 
     data: () => ({
+      messageToSeller: "",
       postsData: [],
       sellerName: "",
       usersNames: [],
@@ -367,6 +400,10 @@
       },
     },
     methods: {
+      appendMessageToSeller(msg) {
+        this.messageToSeller += msg;
+        document.getElementById("messageToSeller").focus();
+      },
       showImage(imageUrls) {
         let urls = "";
         if (imageUrls) {
