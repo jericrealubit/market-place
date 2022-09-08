@@ -1,102 +1,80 @@
 <template>
   <v-container>
     <!-- details -->
-    <v-dialog v-model="detailsDialog" max-width="40%" max-height="50%">
+    <v-dialog v-model="detailsDialog" max-width="700px">
       <v-card>
-        <v-card-title>Message SellerName</v-card-title>
-        <v-icon large>mdi-close-circle-outline</v-icon>
+        <v-layout wrap class="px-2">
+          <v-flex xs10>
+            <v-card-title>Message SellerName</v-card-title>
+          </v-flex>
+          <v-flex xs2>
+            <v-icon large class="float-right pt-4">mdi-close-circle-outline</v-icon>
+          </v-flex>
+        </v-layout>
+
         <v-divider></v-divider>
-        <v-img
-          class="white--text rounded-lg"
-          width="65px"
-          height="65px"
-          :src="details.productimage"
-        >
-        </v-img>
+        <v-layout wrap>
+          <v-flex xs5 sm3>
+            <div class="px-5 pt-5 pb-2 float-right">
+              <v-img class="white--text rounded-lg pa-5" width="100px" height="100px" :src="details.productimage">
+              </v-img>
+            </div>
+          </v-flex>
+          <v-flex xs7 sm9 class="pr-5">
+            <v-card-title>$ {{ details.price }} - {{ details.title }}</v-card-title>
+            <v-card-text class="text--primary">
+              <div>{{ details.description }}</div>
+            </v-card-text>
+          </v-flex>
+        </v-layout>
 
-        <v-card-title>$ {{ details.price }} - {{ details.title }}</v-card-title>
+        <v-layout wrap>
+          <v-flex>
+            <v-btn rounded class="float-right px-2 py-1 ma-1">I'm interested in this item.</v-btn>
+          </v-flex>
+          <v-flex>
+            <v-btn rounded class="float-left px-2 py-1 ma-1">Is this item still available?</v-btn>
+          </v-flex>
+        </v-layout>
+        <v-layout wrap>
+          <v-flex>
+            <v-btn rounded class="float-right px-2 py-1 ma-1">What condition is this item in?</v-btn>
+          </v-flex>
+          <v-flex>
+            <v-btn rounded class="float-left px-2 py-1 ma-1">Do you deliver?</v-btn>
+          </v-flex>
+        </v-layout>
 
-        <v-card-subtitle class="pb-0">{{ details.location }}</v-card-subtitle>
+        <v-textarea outlined label="Please type your message to the seller" class="pa-5">
+        </v-textarea>
 
-        <v-card-text class="text--primary">
-          <div>{{ details.description }}</div>
-        </v-card-text>
-
-          <v-btn rounded>I'm interested in this item.</v-btn>
-          <v-btn rounded>Is this item still available?</v-btn>
-          <v-btn rounded>What condition is this item in?</v-btn>
-          <v-btn rounded>Do you deliver?</v-btn>
-          
-        <v-textarea
-          outlined
-          name="input-7-4"
-          label="Please type your message to the seller"
-          class="px-4"
-        ></v-textarea>
-        
-        <div class="text-no-wrap">Don't share your email, phone or financial information.</div>
         <v-divider></v-divider>
         <v-card-actions>
           <v-btn text @click="(agreement = false), (dialog = false)">
             Cancel
           </v-btn>
           <v-spacer></v-spacer>
-          <v-btn
-            class="white--text"
-            color="deep-purple accent-4"
-            @click="(agreement = true), (dialog = false)"
-          >
+          <v-btn class="white--text" color="deep-purple accent-4" @click="(agreement = true), (dialog = false)">
             Send Message
           </v-btn>
         </v-card-actions>
-
       </v-card>
     </v-dialog>
 
     <v-row>
-      <v-progress-linear
-        v-if="postsLoading"
-        indeterminate
-        color="cyan"
-      ></v-progress-linear>
+      <v-progress-linear v-if="postsLoading" indeterminate color="cyan"></v-progress-linear>
 
-      <v-col
-        v-for="(post, n) in posts"
-        :key="n"
-        class="d-flex child-flex pa-4"
-        cols="12"
-        xs="6"
-        sm="4"
-        md="3"
-        xl="2"
-      >
-        <v-card
-          :loading="loading"
-          class="mx-auto my-1"
-          id="card"
-          title="View Details"
-          @click="showDetails(post._id)"
-        >
+      <v-col v-for="(post, n) in posts" :key="n" class="d-flex child-flex pa-4" cols="12" xs="6" sm="4" md="3" xl="2">
+        <v-card :loading="loading" class="mx-auto my-1" id="card" title="View Details" @click="showDetails(post._id)">
           <template slot="progress">
-            <v-progress-linear
-              color="deep-purple"
-              height="10"
-              indeterminate
-            ></v-progress-linear>
+            <v-progress-linear color="deep-purple" height="10" indeterminate></v-progress-linear>
           </template>
 
-          <v-img
-            :src="post.productimage"
-            :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
-            aspect-ratio="1"
-            class="grey lighten-2"
-          >
+          <v-img :src="post.productimage" :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`" aspect-ratio="1"
+            class="grey lighten-2">
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">
-                <v-progress-circular
-                  indeterminate
-                  color="grey lighten-5"
-                ></v-progress-circular>
+                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
               </v-row>
             </template>
           </v-img>
@@ -123,35 +101,16 @@
       </v-card>
 
       <!-- datatable -->
-      <v-data-table
-        :headers="headTitle"
-        :items="posts"
-        :search="search"
-        :items-per-page="5"
-        :loading="loading"
-        loading-text="Loading... Please wait"
-        class="elevation-1"
-      >
+      <v-data-table :headers="headTitle" :items="posts" :search="search" :items-per-page="5" :loading="loading"
+        loading-text="Loading... Please wait" class="elevation-1">
         <!-- search bar -->
         <template v-slot:top>
           <v-toolbar flat color="white">
             <v-spacer />
             <div class="d-flex w-100">
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                dense
-                outlined
-                single-line
-                hide-details
-              ></v-text-field>
-              <v-btn
-                title="Add New Profile"
-                color="primary"
-                class="ml-2 white--text"
-                @click="addNew"
-              >
+              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line
+                hide-details></v-text-field>
+              <v-btn title="Add New Profile" color="primary" class="ml-2 white--text" @click="addNew">
                 <v-icon dark>mdi-storefront-plus</v-icon>Add
               </v-btn>
             </div>
@@ -159,68 +118,35 @@
         </template>
 
         <template v-slot:[`item.productimage`]="{ item }">
-          <v-file-input
-            v-if="item._id === editedItem._id"
-            v-model="editedItem.productimage"
-            :hide-details="true"
-            dense
-            single-line
-            :autofocus="true"
-            show-size
-            prepend-icon="mdi-camera"
-            @change="uploadImage"
-          ></v-file-input>
+          <v-file-input v-if="item._id === editedItem._id" v-model="editedItem.productimage" :hide-details="true" dense
+            single-line :autofocus="true" show-size prepend-icon="mdi-camera" @change="uploadImage"></v-file-input>
           <span v-else>
-            <v-img
-              lazy-src="https://picsum.photos/id/11/10/6"
-              max-height="50"
-              max-width="50"
-              :src="item.productimage"
-            ></v-img>
+            <v-img lazy-src="https://picsum.photos/id/11/10/6" max-height="50" max-width="50" :src="item.productimage">
+            </v-img>
           </span>
         </template>
 
         <template v-slot:[`item.price`]="{ item }">
-          <v-text-field
-            v-model="editedItem.price"
-            :hide-details="true"
-            dense
-            single-line
-            v-if="item._id === editedItem._id"
-          ></v-text-field>
+          <v-text-field v-model="editedItem.price" :hide-details="true" dense single-line
+            v-if="item._id === editedItem._id"></v-text-field>
           <span v-else>{{ item.price }}</span>
         </template>
 
         <template v-slot:[`item.title`]="{ item }">
-          <v-text-field
-            v-model="editedItem.title"
-            :hide-details="true"
-            dense
-            single-line
-            v-if="item._id === editedItem._id"
-          ></v-text-field>
+          <v-text-field v-model="editedItem.title" :hide-details="true" dense single-line
+            v-if="item._id === editedItem._id"></v-text-field>
           <span v-else>{{ item.title }}</span>
         </template>
 
         <template v-slot:[`item.description`]="{ item }">
-          <v-text-field
-            v-model="editedItem.description"
-            :hide-details="true"
-            dense
-            single-line
-            v-if="item._id === editedItem._id"
-          ></v-text-field>
+          <v-text-field v-model="editedItem.description" :hide-details="true" dense single-line
+            v-if="item._id === editedItem._id"></v-text-field>
           <span v-else>{{ item.description }}</span>
         </template>
 
         <template v-slot:[`item.location`]="{ item }">
-          <v-text-field
-            v-model="editedItem.location"
-            :hide-details="true"
-            dense
-            single-line
-            v-if="item._id === editedItem._id"
-          ></v-text-field>
+          <v-text-field v-model="editedItem.location" :hide-details="true" dense single-line
+            v-if="item._id === editedItem._id"></v-text-field>
           <span v-else>{{ item.location }}</span>
         </template>
 
@@ -234,12 +160,7 @@
             </v-icon>
           </div>
           <div v-else>
-            <v-icon
-              color="green"
-              class="mr-3"
-              @click="editItem(item)"
-              title="Edit"
-            >
+            <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
               mdi-pencil
             </v-icon>
             <v-icon color="red" @click="deleteItem(item)" title="Delete">
@@ -450,6 +371,7 @@ export default {
       }
     },
     showDetails(post_id) {
+
       console.log(post_id);
       //
 
@@ -466,6 +388,7 @@ export default {
           this.details.location = data.location;
           this.details.user_id = data.user_id;
           console.log(this.details);
+          document.querySelector("div.v-text-field__details > div > div").innerHTML = "Don't share your email, phone or financial information."
         })
         .catch((err) => {
           if (err) throw err;
@@ -481,6 +404,8 @@ export default {
       // set user_id
       this.formValues.user_id = localStorage.userId;
     }
+
+
   },
 };
 </script>
