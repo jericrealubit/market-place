@@ -4,9 +4,10 @@
 
     <!-- App bar -->
     <v-app-bar app color="primary" dark dense>
-      <v-toolbar-title>Profiles</v-toolbar-title>
+      <v-toolbar-title>Market Place</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn text rounded>Home</v-btn>
+      <v-btn text rounded @click="setBuy">Buy</v-btn>
+      <v-btn text rounded @click="setSell">Sell</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
       <v-btn
         v-if="loggedUser != 'guest'"
@@ -38,7 +39,7 @@
     <v-footer color="primary lighten-1" padless>
       <v-row justify="center" no-gutters>
         <v-card-text class="py-2 white--text text-center">
-          {{ new Date().getFullYear() }} — <strong>Profiles</strong>
+          {{ new Date().getFullYear() }} — <strong>Market Place</strong>
         </v-card-text>
       </v-row>
     </v-footer>
@@ -58,6 +59,12 @@
       loginform: false,
     }),
     methods: {
+      setBuy() {
+        localStorage.buying = true;
+      },
+      setSell() {
+        localStorage.buying = false;
+      },
       logout() {
         localStorage.removeItem("loggedUser");
         localStorage.removeItem("userId");
