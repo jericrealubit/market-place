@@ -331,6 +331,7 @@
     name: "PostsList",
 
     data: () => ({
+      buySell: "",
       messageToSeller: "",
       postsData: [],
       sellerName: "",
@@ -424,17 +425,26 @@
         fetch(api)
           .then((response) => response.json())
           .then((data) => {
-            // filter data to show only post that match the user_id
-            if (localStorage.userId) {
-              let postData = [];
-              data.forEach((element) => {
-                if (localStorage.userId == element.user_id) {
-                  postData.push(element);
-                }
-              });
-              this.posts = postData;
-            } else {
+            localStorage.callLogin = true;
+            if (localStorage.buying) {
               this.posts = data;
+              console.log("buying true");
+            } else {
+              console.log("buying false");
+              // filter data to show only post that match the user_id
+              if (localStorage.userId) {
+                let postData = [];
+                data.forEach((element) => {
+                  if (localStorage.userId == element.user_id) {
+                    postData.push(element);
+                  }
+                });
+                this.posts = postData;
+              } else {
+                // call login
+                console.log("call login");
+                localStorage.callLogin = true;
+              }
             }
 
             // set posts data
