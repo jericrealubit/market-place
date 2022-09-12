@@ -81,6 +81,8 @@
           </v-flex>
         </v-layout>
 
+        <MessageList />
+
         <v-textarea
           id="messageToSeller"
           v-model="messageToSeller"
@@ -322,15 +324,21 @@
 </template>
 
 <script>
+  import MessageList from "./MessageList.vue";
   const axios = require("axios");
   const formData = require("form-data");
   const api = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
   const apiUsers =
     "https://api-users-jeric.netlify.app/.netlify/functions/api/";
+  const apiMessages =
+    "https://api-messages-jeric.netlify.app/.netlify/functions/api";
+
   export default {
-    name: "PostsList",
+    components: { MessageList },
+    name: "PostList",
 
     data: () => ({
+      msgFormValues: "", // continue here
       buySell: "",
       messageToSeller: "",
       postsData: [],
@@ -406,6 +414,19 @@
       sendMsgToSeller() {
         console.log(this.messageToSeller);
         this.detailsDialog = false;
+        // save to message database
+        fetch(apiMessages, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.msgFormValues),
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((err) => {
+            if (err) throw err;
+          });
       },
       appendMessageToSeller(msg) {
         this.messageToSeller += msg;
