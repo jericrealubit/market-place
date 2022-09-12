@@ -30,6 +30,12 @@
           </v-flex>
         </v-layout>
 
+        <v-layout wrap class="pb-5">
+          <v-flex>
+            <MessageList :msglist="msglist" />
+          </v-flex>
+        </v-layout>
+
         <v-layout wrap>
           <v-flex>
             <v-btn rounded class="float-right px-2 py-1 ma-1"
@@ -51,8 +57,6 @@
               deliver?</v-btn>
           </v-flex>
         </v-layout>
-
-        <MessageList />
 
         <v-textarea v-model="msgFormValues.message" id="messageToSeller" outlined
           label="Please type your message to the seller" class="pa-5" @keyup.enter="sendMsgToSeller(details.post_id)">
@@ -207,6 +211,8 @@ export default {
   name: "PostList",
 
   data: () => ({
+    allMessages: [],
+    msglist: [],
     msgFormValues: {
       user_id: "",
       post_id: "",
@@ -287,8 +293,8 @@ export default {
   methods: {
     sendMsgToSeller(post_id) {
       this.msgFormValues.post_id = post_id;
-      this.msgFormValues.user_id = this.formValues.user_id;
-      console.log(this.msgFormValues);
+      this.msgFormValues.user_id = this.formValues.user_id || "Guest";
+      //console.log(this.msgFormValues);
       this.detailsDialog = false;
       //save to message database
       fetch(apiMessages, {
@@ -299,6 +305,7 @@ export default {
         .then((response) => response.text())
         .then((data) => {
           console.log(data);
+          this.getAllMessages(); // refresh all message list
         })
         .catch((err) => {
           if (err) throw err;
@@ -458,9 +465,23 @@ export default {
         console.log(error);
       }
     },
+    getMessages(post_id) {
+      this.msglist = [];
+      if (post_id) {
+        let singlePost = [];
+        this.allMessages.forEach((element) => {
+          if (element.post_id == post_id) {
+            singlePost.push(element);
+          }
+        });
+        this.msglist = singlePost;
+      }
+    },
     showDetails(post_id) {
       // clear message to seller
       this.msgFormValues.message = "";
+
+      this.getMessages(post_id);
 
       let data = this.postsData[post_id];
       this.details.post_id = post_id;
@@ -477,11 +498,27 @@ export default {
     detailClose() {
       this.detailsDialog = false;
     },
+    getAllMessages() {
+      fetch(apiMessages)
+      .then((response) => response.json())
+      .then((data) => {
+        this.allMessages = data;
+      })
+      .catch((err) => {
+        if (err) throw err;
+      });
+    }
   },
   mounted() {
+
+    // get all messages
+    this.getAllMessages();
+
+    // call get all post
     this.getPosts();
+
+    // set user_id
     if (localStorage.userId) {
-      // set user_id
       this.formValues.user_id = localStorage.userId;
     }
 

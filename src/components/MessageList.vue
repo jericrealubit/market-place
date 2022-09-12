@@ -1,12 +1,17 @@
 <template>
   <div>
-    <div>Message List Here</div>
-
     <v-card class="mx-auto" max-width="400" tile>
+      <v-card-title>
+        <v-icon large left>
+          mdi-message-bulleted
+        </v-icon>
+        <span class="text-h6 font-weight-light">Messages</span>
+      </v-card-title>
       <v-list-item v-for="(msg, i) in msglist" :key="i">
         <v-list-item-content>
-          <v-list-item-title>aa{{ msg.user_id }}</v-list-item-title>
-          <v-list-item-subtitle>bb{{ msg.message }}</v-list-item-subtitle>
+          <v-list-item-title>{{ msg.user_id }}</v-list-item-title>
+          <v-list-item-subtitle>{{ msg.message }}</v-list-item-subtitle>
+          <v-divider></v-divider>
         </v-list-item-content>
       </v-list-item>
     </v-card>
@@ -14,27 +19,14 @@
 </template>
 
 <script>
-  const apiMessages =
-    "https://api-messages-jeric.netlify.app/.netlify/functions/api";
-
-  export default {
-    name: "MessageList",
-
-    data: () => ({
-      msglist: [],
-    }),
-    methods: {
-      getAll() {
-        fetch(apiMessages)
-          .then((response) => response.json())
-          .then((data) => {
-            this.msglist = data;
-            console.log("get all messages");
-          })
-          .catch((err) => {
-            if (err) throw err;
-          });
-      },
-    },
-  };
+export default {
+  name: "MessageList",
+  props: {
+    msglist: {
+      type: Array,
+      required: true
+    }
+  },
+  data: () => ({}),
+};
 </script>
