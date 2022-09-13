@@ -32,7 +32,7 @@
 
         <v-layout wrap class="pb-5">
           <v-flex>
-            <MessageList :msglist="msglist" />
+            <MessageList :msglist="msglist" :usersNames="usersNames" />
           </v-flex>
         </v-layout>
 
@@ -112,7 +112,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="formValues.user_id">
+    <v-row v-if="!buying">
       <!-- message -->
       <v-card>
         <v-card-text class="pl-10 pb-0">
@@ -200,7 +200,7 @@
 import MessageList from "./MessageList.vue";
 const axios = require("axios");
 const formData = require("form-data");
-const api = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
+const apiPosts = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
 const apiUsers =
   "https://api-users-jeric.netlify.app/.netlify/functions/api/";
 const apiMessages =
@@ -210,6 +210,12 @@ export default {
   components: { MessageList },
   name: "PostList",
 
+  props: {
+    buying: {
+      type: Boolean,
+      required: true
+    }
+  },
   data: () => ({
     allMessages: [],
     msglist: [],
@@ -329,18 +335,11 @@ export default {
       return urls;
     },
     getPosts() {
-      fetch(api)
+      fetch(apiPosts)
         .then((response) => response.json())
         .then((data) => {
-          this.posts = data;
-          //localStorage.callLogin = true;
-          // if (localStorage.buying) {
-          //   this.posts = data;
-          //   console.log("buying true");
-          // } else {
-          console.log("buying false");
-          // filter data to show only post that match the user_id
-          if (localStorage.userId) {
+
+          if (localStorage.userId && !this.buying) {
             let postData = [];
             data.forEach((element) => {
               if (localStorage.userId == element.user_id) {
@@ -348,12 +347,9 @@ export default {
               }
             });
             this.posts = postData;
-            // } else {
-            //   // call login
-            //   console.log("call login");
-            //   localStorage.callLogin = true;
+          } else {
+            this.posts = data;
           }
-          //}
 
           // set posts data
           data.forEach((element) => {
@@ -377,7 +373,7 @@ export default {
       if (confirm("Are you sure you want to delete this item?")) {
         const index = this.posts.indexOf(item);
         this.posts.splice(index, 1);
-        fetch(api + item._id, {
+        fetch(apiPosts + item._id, {
           method: "DELETE",
         })
           .then((response) => response.text())
@@ -416,7 +412,7 @@ export default {
         this.formValues.description = this.editedItem.description;
         this.formValues.location = this.editedItem.location;
         Object.assign(this.posts[this.editedIndex], this.editedItem);
-        let fetchApi = this.id ? api + this.id : api;
+        let fetchApi = this.id ? apiPosts + this.id : apiPosts;
         let fetchMethod = this.id ? "PUT" : "POST";
         fetch(fetchApi, {
           method: fetchMethod,
@@ -503,13 +499,13 @@ export default {
     },
     getAllMessages() {
       fetch(apiMessages)
-      .then((response) => response.json())
-      .then((data) => {
-        this.allMessages = data;
-      })
-      .catch((err) => {
-        if (err) throw err;
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          this.allMessages = data;
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
     }
   },
   mounted() {

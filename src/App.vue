@@ -6,16 +6,10 @@
     <v-app-bar app color="primary" dark dense>
       <v-toolbar-title>Market Place</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn text rounded @click="setBuy">Buy</v-btn>
-      <v-btn text rounded @click="setSell">Sell</v-btn>
+      <v-btn text rounded @click="setBuying">Buy</v-btn>
+      <v-btn text rounded @click="setSelling">Sell</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn
-        v-if="loggedUser != 'guest'"
-        text
-        rounded
-        @click="logout"
-        title="logout"
-      >
+      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout" title="logout">
         <v-icon small>mdi-logout</v-icon>
       </v-btn>
       <v-btn v-else text rounded @click="login" title="login">
@@ -29,7 +23,7 @@
         <v-row no-gutters>
           <v-col>
             <!-- <ProfileList /> -->
-            <PostList />
+            <PostList :buying="buying" />
           </v-col>
         </v-row>
       </v-container>
@@ -47,42 +41,45 @@
 </template>
 
 <script>
-  // import ProfileList from "./components/ProfileList.vue"
-  // import UploadImage from "./components/UploadImage.vue"
-  import UserLogin from "./components/UserLogin.vue";
-  import PostList from "./components/PostList.vue";
-  export default {
-    components: { PostList, UserLogin },
-    name: "App",
-    data: () => ({
-      loggedUser: "guest",
-      loginform: false,
-    }),
-    methods: {
-      setBuy() {
-        localStorage.buying = true;
-      },
-      setSell() {
-        localStorage.buying = false;
-      },
-      logout() {
-        localStorage.removeItem("loggedUser");
-        localStorage.removeItem("userId");
-        document.location.reload(true); // force page reload
-      },
-      setLoggedUser(loggedInUser) {
-        this.loggedUser = loggedInUser;
-      },
-      login() {
-        this.loginform = true;
-      },
+import UserLogin from "./components/UserLogin.vue";
+import PostList from "./components/PostList.vue";
+export default {
+  components: { PostList, UserLogin },
+  name: "App",
+  data: () => ({
+    buying: true,
+    loggedUser: "guest",
+    loginform: false,
+  }),
+  methods: {
+    setSelling() {
+      this.buying = false;
+      document.location.reload(true);
     },
-    mounted() {
-      if (localStorage.loggedUser) {
-        this.loggedUser = localStorage.loggedUser;
-      }
+    setBuying() {
+      this.buying = true;
+      document.location.reload(true);
     },
-  };
+    logout() {
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("userId");
+      document.location.reload(true); // force page reload
+    },
+    setLoggedUser(loggedInUser) {
+      this.loggedUser = loggedInUser;
+    },
+    login() {
+      this.loginform = true;
+    },
+  },
+  mounted() {
+    if (localStorage.loggedUser) {
+      this.loggedUser = localStorage.loggedUser;
+    }
+  },
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>
