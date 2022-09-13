@@ -9,7 +9,7 @@
       </v-card-title>
       <v-list-item v-for="(msg, i) in msglist" :key="i">
         <v-list-item-content>
-          <v-list-item-title>{{ msg.user_id }}</v-list-item-title>
+          <v-list-item-title>{{ usersNames[msg.user_id] }}</v-list-item-title>
           <v-list-item-subtitle>{{ msg.message }}</v-list-item-subtitle>
           <v-divider></v-divider>
         </v-list-item-content>
@@ -23,6 +23,10 @@ export default {
   name: "MessageList",
   props: {
     msglist: {
+      type: Array,
+      required: true
+    },
+    usersNames: {
       type: Array,
       required: true
     }
