@@ -292,10 +292,13 @@ export default {
   },
   methods: {
     sendMsgToSeller(post_id) {
+      // close the form
+      this.detailsDialog = false;
+
+      // set data
       this.msgFormValues.post_id = post_id;
       this.msgFormValues.user_id = this.formValues.user_id || "Guest";
-      //console.log(this.msgFormValues);
-      this.detailsDialog = false;
+
       //save to message database
       fetch(apiMessages, {
         method: "POST",
