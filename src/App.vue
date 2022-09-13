@@ -9,7 +9,13 @@
       <v-btn text rounded @click="setBuying">Buy</v-btn>
       <v-btn text rounded @click="setSelling">Sell</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout" title="logout">
+      <v-btn
+        v-if="loggedUser != 'guest'"
+        text
+        rounded
+        @click="logout"
+        title="logout"
+      >
         <v-icon small>mdi-logout</v-icon>
       </v-btn>
       <v-btn v-else text rounded @click="login" title="login">
@@ -23,7 +29,7 @@
         <v-row no-gutters>
           <v-col>
             <!-- <ProfileList /> -->
-            <PostList :buying="buying" />
+            <PostList />
           </v-col>
         </v-row>
       </v-container>
@@ -43,22 +49,26 @@
 <script>
 import UserLogin from "./components/UserLogin.vue";
 import PostList from "./components/PostList.vue";
+
+import { provide } from "vue";
+import store from "@/store";
 export default {
+  setup() {
+    provide("store", store);
+  },
+
   components: { PostList, UserLogin },
   name: "App",
   data: () => ({
-    buying: true,
     loggedUser: "guest",
     loginform: false,
   }),
   methods: {
     setSelling() {
-      this.buying = false;
-      document.location.reload(true);
+      store.state.buying = false;
     },
     setBuying() {
-      this.buying = true;
-      document.location.reload(true);
+      store.state.buying = true;
     },
     logout() {
       localStorage.removeItem("loggedUser");
@@ -80,6 +90,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

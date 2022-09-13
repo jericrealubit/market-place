@@ -125,7 +125,7 @@
       </v-card>
     </v-dialog>
 
-    <v-row>
+    <v-row v-if="store.state.buying">
       <v-progress-linear
         v-if="postsLoading"
         indeterminate
@@ -186,7 +186,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="!buying">
+    <v-row v-if="!store.state.buying">
       <!-- message -->
       <v-card>
         <v-card-text class="pl-10 pb-0">
@@ -197,7 +197,7 @@
       <!-- datatable -->
       <v-data-table
         :headers="headTitle"
-        :items="posts"
+        :items="userPosts"
         :search="search"
         :items-per-page="5"
         :loading="loading"
@@ -337,16 +337,18 @@ const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api/";
 const apiMessages =
   "https://api-messages-jeric.netlify.app/.netlify/functions/api";
 
+import { inject } from "vue";
 export default {
+  setup() {
+    const store = inject("store");
+
+    return {
+      store,
+    };
+  },
+
   components: { MessageList },
   name: "PostList",
-
-  props: {
-    buying: {
-      type: Boolean,
-      required: true,
-    },
-  },
   data: () => ({
     allMessages: [],
     msglist: [],
@@ -377,6 +379,7 @@ export default {
     loading: true,
     showPassword: false,
     posts: [],
+    userPosts: [],
     id: "", // id to update PUT:id, was set by GET:id
     headTitle: [
       { text: "Item", value: "productimage" },
@@ -469,19 +472,20 @@ export default {
       fetch(apiPosts)
         .then((response) => response.json())
         .then((data) => {
-          if (localStorage.userId && !this.buying) {
+          // set posts data
+          this.posts = data;
+
+          // get user posts
+          if (localStorage.userId) {
             let postData = [];
-            data.forEach((element) => {
+            this.posts.forEach((element) => {
               if (localStorage.userId == element.user_id) {
                 postData.push(element);
               }
             });
-            this.posts = postData;
-          } else {
-            this.posts = data;
+            this.userPosts = postData;
           }
 
-          // set posts data
           data.forEach((element) => {
             this.postsData[element._id] = element;
           });
@@ -658,9 +662,11 @@ export default {
       .then((data) => {
         data.forEach((element) => {
           this.usersNames[element._id] =
-            element.firstname.charAt(0).toUpperCase() + element.firstname.slice(1)
-            + " " +
-            element.lastname.charAt(0).toUpperCase() + element.lastname.slice(1);
+            element.firstname.charAt(0).toUpperCase() +
+            element.firstname.slice(1) +
+            " " +
+            element.lastname.charAt(0).toUpperCase() +
+            element.lastname.slice(1);
         });
       })
       .catch((err) => {
