@@ -1,16 +1,18 @@
 <template>
   <div>
-    <v-card class="mx-auto" max-width="400" tile>
+    <v-card class="mx-auto" max-width="500" tile>
       <v-card-title>
-        <v-icon large left>
-          mdi-message-bulleted
-        </v-icon>
+        <v-icon large left> mdi-message-bulleted </v-icon>
         <span class="text-h6 font-weight-light">Messages</span>
       </v-card-title>
       <v-list-item v-for="(msg, i) in msglist" :key="i">
         <v-list-item-content>
-          <v-list-item-title>{{ usersNames[msg.user_id] }}</v-list-item-title>
-          <v-list-item-subtitle>{{ msg.message }}</v-list-item-subtitle>
+          <v-list-item-title>{{
+            msg.user_id ? usersNames[msg.user_id] : "Guest"
+          }}</v-list-item-title>
+          <v-list-item-subtitle class="text-wrap">{{
+            msg.message
+          }}</v-list-item-subtitle>
           <v-divider></v-divider>
         </v-list-item-content>
       </v-list-item>
@@ -24,12 +26,12 @@ export default {
   props: {
     msglist: {
       type: Array,
-      required: true
+      required: true,
     },
     usersNames: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({}),
 };

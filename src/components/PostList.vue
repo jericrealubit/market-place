@@ -8,7 +8,12 @@
             <v-card-title>Message {{ sellerName }}</v-card-title>
           </v-flex>
           <v-flex xs2>
-            <v-btn icon class="float-right mt-4" title="close" @click="detailClose">
+            <v-btn
+              icon
+              class="float-right mt-4"
+              title="close"
+              @click="detailClose"
+            >
               <v-icon large>mdi-close-circle-outline</v-icon>
             </v-btn>
           </v-flex>
@@ -18,12 +23,19 @@
         <v-layout wrap>
           <v-flex xs5 sm3>
             <div class="px-5 pt-5 pb-2 float-right">
-              <v-img class="white--text rounded-lg pa-5" width="100px" height="100px" :src="details.productimage">
+              <v-img
+                class="white--text rounded-lg pa-5"
+                width="100px"
+                height="100px"
+                :src="details.productimage"
+              >
               </v-img>
             </div>
           </v-flex>
           <v-flex xs7 sm9 class="pr-5">
-            <v-card-title>$ {{ details.price }} - {{ details.title }}</v-card-title>
+            <v-card-title
+              >$ {{ details.price }} - {{ details.title }}</v-card-title
+            >
             <v-card-text class="text--primary">
               <div>{{ details.description }}</div>
             </v-card-text>
@@ -38,41 +50,73 @@
 
         <v-layout wrap>
           <v-flex>
-            <v-btn rounded class="float-right px-2 py-1 ma-1"
-              @click="appendMessageToSeller(` I'm interested in this item. `)">I'm interested in this item.</v-btn>
+            <v-btn
+              rounded
+              class="float-right px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` I'm interested in this item. `)"
+              >I'm interested in this item.</v-btn
+            >
           </v-flex>
           <v-flex>
-            <v-btn rounded class="float-left px-2 py-1 ma-1"
-              @click="appendMessageToSeller(` Is this item still available? `)">Is this item still available?</v-btn>
+            <v-btn
+              rounded
+              class="float-left px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` Is this item still available? `)"
+              >Is this item still available?</v-btn
+            >
           </v-flex>
         </v-layout>
         <v-layout wrap>
           <v-flex>
-            <v-btn rounded class="float-right px-2 py-1 ma-1" @click="
-              appendMessageToSeller(` What condition is this item in? `)
-            ">What condition is this item in?</v-btn>
+            <v-btn
+              rounded
+              class="float-right px-2 py-1 ma-1"
+              @click="
+                appendMessageToSeller(` What condition is this item in? `)
+              "
+              >What condition is this item in?</v-btn
+            >
           </v-flex>
           <v-flex>
-            <v-btn rounded class="float-left px-2 py-1 ma-1" @click="appendMessageToSeller(` Do you deliver? `)">Do you
-              deliver?</v-btn>
+            <v-btn
+              rounded
+              class="float-left px-2 py-1 ma-1"
+              @click="appendMessageToSeller(` Do you deliver? `)"
+              >Do you deliver?</v-btn
+            >
           </v-flex>
         </v-layout>
 
-        <v-textarea v-model="msgFormValues.message" id="messageToSeller" outlined
-          label="Please type your message to the seller" class="pa-5" @keyup.enter="sendMsgToSeller(details.post_id)">
+        <v-textarea
+          rows="1"
+          auto-grow
+          v-model="msgFormValues.message"
+          id="messageToSeller"
+          outlined
+          label="Please type your message to the seller"
+          class="pa-5"
+        >
         </v-textarea>
 
         <v-divider></v-divider>
         <v-layout>
           <v-flex>
-            <v-btn class="px-5 py-2 ma-3 ml-5 float-left" @click="detailClose" title="cancel">
+            <v-btn
+              class="px-5 py-2 ma-3 ml-5 float-left"
+              @click="detailClose"
+              title="cancel"
+            >
               <v-icon class="pr-2">mdi-message-off</v-icon>
               Cancel
             </v-btn>
           </v-flex>
           <v-flex>
-            <v-btn class="px-5 py-2 ma-3 float-right mr-5" title="send message"
-              :disabled="msgFormValues.message.length ? false : true" @click="sendMsgToSeller(details.post_id)">
+            <v-btn
+              class="px-5 py-2 ma-3 float-right mr-5"
+              title="send message"
+              :disabled="msgFormValues.message.length ? false : true"
+              @click="sendMsgToSeller(details.post_id)"
+            >
               <v-icon class="pr-2">mdi-message-text-outline</v-icon>
               Send Message
             </v-btn>
@@ -82,19 +126,49 @@
     </v-dialog>
 
     <v-row>
-      <v-progress-linear v-if="postsLoading" indeterminate color="cyan"></v-progress-linear>
+      <v-progress-linear
+        v-if="postsLoading"
+        indeterminate
+        color="cyan"
+      ></v-progress-linear>
 
-      <v-col v-for="(post, n) in posts" :key="n" class="d-flex child-flex pa-4" cols="12" xs="6" sm="4" md="3" xl="2">
-        <v-card :loading="loading" class="mx-auto my-1" id="card" title="View Details" @click="showDetails(post._id)">
+      <v-col
+        v-for="(post, n) in posts"
+        :key="n"
+        class="d-flex child-flex pa-4"
+        cols="12"
+        xs="6"
+        sm="4"
+        md="3"
+        xl="2"
+      >
+        <v-card
+          :loading="loading"
+          class="mx-auto my-1"
+          id="card"
+          title="View Details"
+          @click="showDetails(post._id)"
+        >
           <template slot="progress">
-            <v-progress-linear color="deep-purple" height="10" indeterminate></v-progress-linear>
+            <v-progress-linear
+              color="deep-purple"
+              height="10"
+              indeterminate
+            ></v-progress-linear>
           </template>
 
-          <v-img :src="post.productimage" :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`" aspect-ratio="1"
-            class="grey lighten-2">
+          <v-img
+            :src="post.productimage"
+            :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
+            aspect-ratio="1"
+            class="grey lighten-2"
+          >
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">
-                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                <v-progress-circular
+                  indeterminate
+                  color="grey lighten-5"
+                ></v-progress-circular>
               </v-row>
             </template>
           </v-img>
@@ -121,16 +195,35 @@
       </v-card>
 
       <!-- datatable -->
-      <v-data-table :headers="headTitle" :items="posts" :search="search" :items-per-page="5" :loading="loading"
-        loading-text="Loading... Please wait" class="elevation-1">
+      <v-data-table
+        :headers="headTitle"
+        :items="posts"
+        :search="search"
+        :items-per-page="5"
+        :loading="loading"
+        loading-text="Loading... Please wait"
+        class="elevation-1"
+      >
         <!-- search bar -->
         <template v-slot:top>
           <v-toolbar flat color="white">
             <v-spacer />
             <div class="d-flex w-100">
-              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" dense outlined single-line
-                hide-details></v-text-field>
-              <v-btn title="Add New Profile" color="primary" class="ml-2 white--text" @click="addNew">
+              <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Search"
+                dense
+                outlined
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-btn
+                title="Add New Profile"
+                color="primary"
+                class="ml-2 white--text"
+                @click="addNew"
+              >
                 <v-icon dark>mdi-storefront-plus</v-icon>Add
               </v-btn>
             </div>
@@ -138,35 +231,69 @@
         </template>
 
         <template v-slot:[`item.productimage`]="{ item }">
-          <v-file-input v-if="item._id === editedItem._id" v-model="editedItem.productimage" :hide-details="true" dense
-            single-line :autofocus="true" show-size prepend-icon="mdi-camera" @change="uploadImage"></v-file-input>
+          <v-file-input
+            v-if="item._id === editedItem._id"
+            v-model="editedItem.productimage"
+            :hide-details="true"
+            dense
+            single-line
+            :autofocus="true"
+            show-size
+            prepend-icon="mdi-camera"
+            @change="uploadImage"
+          ></v-file-input>
           <span v-else>
-            <v-img lazy-src="https://picsum.photos/id/11/10/6" max-height="50" max-width="50" :src="item.productimage">
+            <v-img
+              lazy-src="https://picsum.photos/id/11/10/6"
+              max-height="50"
+              max-width="50"
+              :src="item.productimage"
+            >
             </v-img>
           </span>
         </template>
 
         <template v-slot:[`item.price`]="{ item }">
-          <v-text-field v-model="editedItem.price" :hide-details="true" dense single-line
-            v-if="item._id === editedItem._id"></v-text-field>
+          <v-text-field
+            v-model="editedItem.price"
+            :hide-details="true"
+            dense
+            single-line
+            v-if="item._id === editedItem._id"
+          ></v-text-field>
           <span v-else>{{ item.price }}</span>
         </template>
 
         <template v-slot:[`item.title`]="{ item }">
-          <v-text-field v-model="editedItem.title" :hide-details="true" dense single-line
-            v-if="item._id === editedItem._id"></v-text-field>
+          <v-text-field
+            v-model="editedItem.title"
+            :hide-details="true"
+            dense
+            single-line
+            v-if="item._id === editedItem._id"
+          ></v-text-field>
           <span v-else>{{ item.title }}</span>
         </template>
 
         <template v-slot:[`item.description`]="{ item }">
-          <v-text-field v-model="editedItem.description" :hide-details="true" dense single-line
-            v-if="item._id === editedItem._id"></v-text-field>
+          <v-text-field
+            v-model="editedItem.description"
+            :hide-details="true"
+            dense
+            single-line
+            v-if="item._id === editedItem._id"
+          ></v-text-field>
           <span v-else>{{ item.description }}</span>
         </template>
 
         <template v-slot:[`item.location`]="{ item }">
-          <v-text-field v-model="editedItem.location" :hide-details="true" dense single-line
-            v-if="item._id === editedItem._id"></v-text-field>
+          <v-text-field
+            v-model="editedItem.location"
+            :hide-details="true"
+            dense
+            single-line
+            v-if="item._id === editedItem._id"
+          ></v-text-field>
           <span v-else>{{ item.location }}</span>
         </template>
 
@@ -180,7 +307,12 @@
             </v-icon>
           </div>
           <div v-else>
-            <v-icon color="green" class="mr-3" @click="editItem(item)" title="Edit">
+            <v-icon
+              color="green"
+              class="mr-3"
+              @click="editItem(item)"
+              title="Edit"
+            >
               mdi-pencil
             </v-icon>
             <v-icon color="red" @click="deleteItem(item)" title="Delete">
@@ -201,8 +333,7 @@ import MessageList from "./MessageList.vue";
 const axios = require("axios");
 const formData = require("form-data");
 const apiPosts = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
-const apiUsers =
-  "https://api-users-jeric.netlify.app/.netlify/functions/api/";
+const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api/";
 const apiMessages =
   "https://api-messages-jeric.netlify.app/.netlify/functions/api";
 
@@ -213,8 +344,8 @@ export default {
   props: {
     buying: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     allMessages: [],
@@ -223,7 +354,7 @@ export default {
       user_id: "",
       post_id: "",
       message: "",
-      messageimage: ""
+      messageimage: "",
     },
     buySell: "",
     postsData: [],
@@ -303,7 +434,7 @@ export default {
 
       // set data
       this.msgFormValues.post_id = post_id;
-      this.msgFormValues.user_id = this.formValues.user_id || "Guest";
+      this.msgFormValues.user_id = this.formValues.user_id;
 
       //save to message database
       fetch(apiMessages, {
@@ -338,7 +469,6 @@ export default {
       fetch(apiPosts)
         .then((response) => response.json())
         .then((data) => {
-
           if (localStorage.userId && !this.buying) {
             let postData = [];
             data.forEach((element) => {
@@ -506,10 +636,9 @@ export default {
         .catch((err) => {
           if (err) throw err;
         });
-    }
+    },
   },
   mounted() {
-
     // get all messages
     this.getAllMessages();
 
@@ -529,7 +658,9 @@ export default {
       .then((data) => {
         data.forEach((element) => {
           this.usersNames[element._id] =
-            element.firstname + " " + element.lastname;
+            element.firstname.charAt(0).toUpperCase() + element.firstname.slice(1)
+            + " " +
+            element.lastname.charAt(0).toUpperCase() + element.lastname.slice(1);
         });
       })
       .catch((err) => {
