@@ -165,138 +165,148 @@
 </template>
 
 <script>
-const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
-export default {
-  name: "UserLogin",
-  data: () => ({
-    isEmailError: false,
-    emailErrorMsg: "Email is already taken",
-    isLoginError: false,
-    loginErrorMsg: "Email or Password does not match",
-    loggedUser: "",
-    users: [],
-    dialog: true,
-    tab: 0,
-    tabs: [
-      { name: "Login", icon: "mdi-account" },
-      { name: "Register", icon: "mdi-account-outline" },
-    ],
-    isFormValid: true,
-    formValues: {
-      firstname: "",
-      lastname: "",
-      email: "",
-      password: "",
-    },
-    loginFormValue: {
-      loginEmail: "",
-      loginPassword: "",
-    },
-    verify: "",
-    loginEmailRules: [
-      (v) => !!v || "Required",
-      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-    ],
-    emailRules: [
-      (v) => !!v || "Required",
-      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-    ],
+  const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
 
-    show1: false,
-    rules: {
-      required: (value) => !!value || "Required.",
-      min: (v) => (v && v.length >= 8) || "Min 8 characters",
+  import { inject } from "vue";
+  export default {
+    setup() {
+      const store = inject("store");
+
+      return {
+        store,
+      };
     },
-  }),
-  computed: {
-    passwordMatch() {
-      return () =>
-        this.formValues.password === this.verify || "Password must match";
+
+    name: "UserLogin",
+    data: () => ({
+      isEmailError: false,
+      emailErrorMsg: "Email is already taken",
+      isLoginError: false,
+      loginErrorMsg: "Email or Password does not match",
+      loggedUser: "",
+      users: [],
+      dialog: true,
+      tab: 0,
+      tabs: [
+        { name: "Login", icon: "mdi-account" },
+        { name: "Register", icon: "mdi-account-outline" },
+      ],
+      isFormValid: true,
+      formValues: {
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+      },
+      loginFormValue: {
+        loginEmail: "",
+        loginPassword: "",
+      },
+      verify: "",
+      loginEmailRules: [
+        (v) => !!v || "Required",
+        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+      ],
+      emailRules: [
+        (v) => !!v || "Required",
+        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+      ],
+
+      show1: false,
+      rules: {
+        required: (value) => !!value || "Required.",
+        min: (v) => (v && v.length >= 8) || "Min 8 characters",
+      },
+    }),
+    computed: {
+      passwordMatch() {
+        return () =>
+          this.formValues.password === this.verify || "Password must match";
+      },
     },
-  },
-  methods: {
-    register() {
-      let validform = this.$refs.registerForm.validate();
-      if (validform) {
-        // check email from database
-        this.users.forEach((element) => {
-          if (element.email == this.formValues.email) {
-            this.isEmailError = true;
+    methods: {
+      register() {
+        let validform = this.$refs.registerForm.validate();
+        if (validform) {
+          // check email from database
+          this.users.forEach((element) => {
+            if (element.email == this.formValues.email) {
+              this.isEmailError = true;
+            }
+          });
+
+          if (!this.isEmailError) {
+            fetch(apiUsers, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(this.formValues),
+            })
+              .then((response) => response.text())
+              .then((data) => {
+                console.log(data);
+                this.dialog = false;
+                this.loggedUser =
+                  this.formValues.firstname + " " + this.formValues.lastname;
+                // localStorage
+                localStorage.userId = data; // inserted document id
+                localStorage.loggedUser = this.loggedUser;
+                this.$emit("logged-user", this.loggedUser);
+                document.location.reload(true); // force page reload to show admin table
+              })
+              .catch((err) => {
+                if (err) throw err;
+              });
+          }
+        }
+      },
+      login() {
+        // let validform = this.$refs.loginForm.validate();
+        // if (validform) {
+        // verify login details
+        this.users.forEach((users) => {
+          if (
+            users.email == this.loginFormValue.loginEmail &&
+            users.password == this.loginFormValue.loginPassword
+          ) {
+            this.loggedUser = users.firstname + " " + users.lastname;
+            // localStorage
+            localStorage.userId = users._id;
+            localStorage.loggedUser = this.loggedUser;
           }
         });
-
-        if (!this.isEmailError) {
-          fetch(apiUsers, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(this.formValues),
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              console.log(data);
-              this.dialog = false;
-              this.loggedUser =
-                this.formValues.firstname + " " + this.formValues.lastname;
-              // localStorage
-              localStorage.userId = data; // inserted document id
-              localStorage.loggedUser = this.loggedUser;
-              this.$emit("logged-user", this.loggedUser);
-              document.location.reload(true); // force page reload to show admin table
-            })
-            .catch((err) => {
-              if (err) throw err;
-            });
+        if (this.loggedUser) {
+          console.log("login successful");
+          this.dialog = false;
+          this.$emit("logged-user", this.loggedUser);
+          document.location.reload(true); // force page reload to show admin table
+        } else {
+          console.log("login failed");
+          this.isLoginError = true;
         }
-      }
+        // }
+      },
+      hideLoginErrorMsg() {
+        this.isLoginError = false;
+      },
+      hideEmailErrorMsg() {
+        this.isEmailError = false;
+      },
     },
-    login() {
-      // let validform = this.$refs.loginForm.validate();
-      // if (validform) {
-      // verify login details
-      this.users.forEach((users) => {
-        if (
-          users.email == this.loginFormValue.loginEmail &&
-          users.password == this.loginFormValue.loginPassword
-        ) {
-          this.loggedUser = users.firstname + " " + users.lastname;
-          // localStorage
-          localStorage.userId = users._id;
-          localStorage.loggedUser = this.loggedUser;
-        }
-      });
-      if (this.loggedUser) {
-        console.log("login successful");
+    mounted() {
+      // check if user is logged-in, do not show login form
+      if (localStorage.loggedUser) {
         this.dialog = false;
-        this.$emit("logged-user", this.loggedUser);
-        document.location.reload(true); // force page reload to show admin table
-      } else {
-        console.log("login failed");
-        this.isLoginError = true;
       }
-      // }
-    },
-    hideLoginErrorMsg() {
-      this.isLoginError = false;
-    },
-    hideEmailErrorMsg() {
-      this.isEmailError = false;
-    },
-  },
-  mounted() {
-    // check if user is logged-in, do not show login form
-    if (localStorage.loggedUser) {
-      this.dialog = false;
-    }
 
-    // get all users
-    fetch(apiUsers)
-      .then((response) => response.json())
-      .then((data) => {
-        this.users = data;
-      })
-      .catch((err) => {
-        if (err) throw err;
-      });
-  },
-};
+      // get all users
+      fetch(apiUsers)
+        .then((response) => response.json())
+        .then((data) => {
+          this.users = data;
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
+    },
+  };
 </script>
