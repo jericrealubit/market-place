@@ -1,7 +1,8 @@
 import { reactive } from "vue"
 
 const state = reactive({
-  buying: true
+  buying: true,
+  showLogin: false
 })
 
 export default {

@@ -47,47 +47,58 @@
 </template>
 
 <script>
-import UserLogin from "./components/UserLogin.vue";
-import PostList from "./components/PostList.vue";
+  import UserLogin from "./components/UserLogin.vue";
+  import PostList from "./components/PostList.vue";
 
-import { provide } from "vue";
-import store from "@/store";
-export default {
-  setup() {
-    provide("store", store);
-  },
-
-  components: { PostList, UserLogin },
-  name: "App",
-  data: () => ({
-    loggedUser: "guest",
-    loginform: false,
-  }),
-  methods: {
-    setSelling() {
-      store.state.buying = false;
+  import { provide } from "vue";
+  import store from "@/store";
+  export default {
+    setup() {
+      provide("store", store);
     },
-    setBuying() {
-      store.state.buying = true;
+    components: { PostList, UserLogin },
+    name: "App",
+    data: () => ({
+      loggedUser: "guest",
+      loginform: false,
+    }),
+    computed: {
+      showLoginForm() {
+        return store.state.showLogin;
+      },
     },
-    logout() {
-      localStorage.removeItem("loggedUser");
-      localStorage.removeItem("userId");
-      document.location.reload(true); // force page reload
+    watch: {
+      showLoginForm(newValue) {
+        this.loginform = newValue;
+      },
     },
-    setLoggedUser(loggedInUser) {
-      this.loggedUser = loggedInUser;
+    methods: {
+      setSelling() {
+        console.log("App" + store.state.showLogin);
+        store.state.buying = false;
+        this.loginform = store.state.showLogin;
+      },
+      setBuying() {
+        store.state.buying = true;
+      },
+      logout() {
+        localStorage.removeItem("loggedUser");
+        localStorage.removeItem("userId");
+        document.location.reload(true); // force page reload
+      },
+      setLoggedUser(loggedInUser) {
+        this.loggedUser = loggedInUser;
+      },
+      login() {
+        this.loginform = true;
+      },
     },
-    login() {
-      this.loginform = true;
+    mounted() {
+      if (localStorage.loggedUser) {
+        this.loggedUser = localStorage.loggedUser;
+      }
     },
-  },
-  mounted() {
-    if (localStorage.loggedUser) {
-      this.loggedUser = localStorage.loggedUser;
-    }
-  },
-};
+  };
 </script>
 
 <style scoped></style>
