@@ -9,13 +9,7 @@
       <v-btn text rounded @click="setBuying">Buy</v-btn>
       <v-btn text rounded @click="setSelling">Sell</v-btn>
       <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn
-        v-if="loggedUser != 'guest'"
-        text
-        rounded
-        @click="logout"
-        title="logout"
-      >
+      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout" title="logout">
         <v-icon small>mdi-logout</v-icon>
       </v-btn>
       <v-btn v-else text rounded @click="login" title="login">
@@ -47,58 +41,60 @@
 </template>
 
 <script>
-  import UserLogin from "./components/UserLogin.vue";
-  import PostList from "./components/PostList.vue";
+import UserLogin from "./components/UserLogin.vue";
+import PostList from "./components/PostList.vue";
 
-  import { provide } from "vue";
-  import store from "@/store";
-  export default {
-    setup() {
-      provide("store", store);
+import { provide } from "vue";
+import store from "@/store";
+export default {
+  setup() {
+    provide("store", store);
+  },
+  components: { PostList, UserLogin },
+  name: "App",
+  data: () => ({
+    loggedUser: "guest",
+    loginform: false,
+  }),
+  computed: {
+    showLoginForm() {
+      return store.state.showLogin;
     },
-    components: { PostList, UserLogin },
-    name: "App",
-    data: () => ({
-      loggedUser: "guest",
-      loginform: false,
-    }),
-    computed: {
-      showLoginForm() {
-        return store.state.showLogin;
-      },
-    },
-    watch: {
-      showLoginForm(newValue) {
+  },
+  watch: {
+    showLoginForm(newValue) {
+      if (!localStorage.loggedUser) {
         this.loginform = newValue;
-      },
-    },
-    methods: {
-      setSelling() {
-        console.log("App" + store.state.showLogin);
-        store.state.buying = false;
-        this.loginform = store.state.showLogin;
-      },
-      setBuying() {
-        store.state.buying = true;
-      },
-      logout() {
-        localStorage.removeItem("loggedUser");
-        localStorage.removeItem("userId");
-        document.location.reload(true); // force page reload
-      },
-      setLoggedUser(loggedInUser) {
-        this.loggedUser = loggedInUser;
-      },
-      login() {
-        this.loginform = true;
-      },
-    },
-    mounted() {
-      if (localStorage.loggedUser) {
-        this.loggedUser = localStorage.loggedUser;
       }
     },
-  };
+  },
+  methods: {
+    setSelling() {
+      store.state.buying = false;
+    },
+    setBuying() {
+      store.state.buying = true;
+    },
+    logout() {
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("userId");
+      document.location.reload(true); // force page reload
+    },
+    setLoggedUser(loggedInUser) {
+      this.loggedUser = loggedInUser;
+    },
+    login() {
+      this.loginform = true;
+    },
+  },
+  mounted() {
+    if (localStorage.loggedUser) {
+      this.loggedUser = localStorage.loggedUser;
+    }
+  },
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>
