@@ -44,7 +44,11 @@
 
         <v-layout wrap class="pb-5">
           <v-flex>
-            <MessageList :msglist="msglist" :usersNames="usersNames" />
+            <MessageList
+              :msglist="msglist"
+              :usersNames="usersNames"
+              :key="reloadMsg"
+            />
           </v-flex>
         </v-layout>
 
@@ -349,6 +353,7 @@ export default {
   components: { MessageList },
   name: "PostList",
   data: () => ({
+    reloadMsg: 0,
     allMessages: [],
     msglist: [],
     msgFormValues: {
@@ -432,11 +437,14 @@ export default {
   methods: {
     sendMsgToSeller(post_id) {
       // close the form
-      this.detailsDialog = false;
+      //this.detailsDialog = false;
 
       // set data
       this.msgFormValues.post_id = post_id;
       this.msgFormValues.user_id = this.formValues.user_id;
+
+      // push the new message
+      //this.msglist.push(this.msgFormValues);
 
       //save to message database
       fetch(apiMessages, {
@@ -448,6 +456,7 @@ export default {
         .then((data) => {
           console.log(data);
           this.getAllMessages(); // refresh all message list
+          this.reloadMsg++; // changing the key to force component reload
         })
         .catch((err) => {
           if (err) throw err;
