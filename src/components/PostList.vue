@@ -164,6 +164,7 @@
           <v-card-text>
             <ul>
               <li v-for="(postmsg, i) in postMessages[post._id]" :key="i">
+                {{ postmsg.user_id ? usersNames[postmsg.user_id] : "Guest" }}:
                 {{ postmsg.message }}
               </li>
             </ul>
@@ -331,7 +332,7 @@
             </div>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary" @click="getPosts">Reset</v-btn>
+            <v-btn color="primary" @click="getAllPosts">Reset</v-btn>
           </template>
         </v-data-table>
       </v-card>
@@ -340,403 +341,388 @@
 </template>
 
 <script>
-  import MessageList from "./MessageList.vue";
-  const axios = require("axios");
-  const formData = require("form-data");
-  const apiPosts =
-    "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
-  const apiUsers =
-    "https://api-users-jeric.netlify.app/.netlify/functions/api/";
-  const apiMessages =
-    "https://api-messages-jeric.netlify.app/.netlify/functions/api";
+import MessageList from "./MessageList.vue";
+const axios = require("axios");
+const formData = require("form-data");
+const apiPosts = "https://api-posts-jeric.netlify.app/.netlify/functions/api/";
+const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api/";
+const apiMessages =
+  "https://api-messages-jeric.netlify.app/.netlify/functions/api";
 
-  import { inject } from "vue";
-  export default {
-    setup() {
-      const store = inject("store");
+import { inject } from "vue";
+export default {
+  setup() {
+    const store = inject("store");
 
-      return {
-        store,
-      };
+    return {
+      store,
+    };
+  },
+
+  components: { MessageList },
+  name: "PostList",
+  data: () => ({
+    postMessages: [],
+    reloadMsg: 0,
+    allMessages: [],
+    msglist: [],
+    msgFormValues: {
+      user_id: "",
+      post_id: "",
+      message: "",
+      messageimage: "",
     },
-
-    components: { MessageList },
-    name: "PostList",
-    data: () => ({
-      postMessages: [],
-      reloadMsg: 0,
-      allMessages: [],
-      msglist: [],
-      msgFormValues: {
-        user_id: "",
-        post_id: "",
-        message: "",
-        messageimage: "",
-      },
-      buySell: "",
-      postsData: [],
-      sellerName: "",
-      usersNames: [],
-      details: {
-        post_id: "",
-        productimage: "",
-        price: "",
-        title: "",
-        description: "",
-        location: "",
-        user_id: "",
-      },
-      detailsDialog: false,
-      postsLoading: true,
-      msg: "",
-      add: true,
-      search: "",
-      loading: true,
-      showPassword: false,
-      posts: [],
-      userPosts: [],
-      id: "", // id to update PUT:id, was set by GET:id
-      headTitle: [
-        { text: "Item", value: "productimage" },
-        { text: "Price", value: "price" },
-        { text: "Title", value: "title" },
-        { text: "Description", value: "description" },
-        { text: "Location", value: "location" },
-        { text: "Actions", value: "actions" },
-      ],
-      formValues: {
-        productimage: "",
-        price: "",
-        title: "",
-        description: "",
-        location: "",
-        user_id: "",
-      },
-      editedIndex: -1,
-      editedItem: {
-        productimage: "",
-        price: "",
-        title: "",
-        description: "",
-        location: "",
-        user_id: "",
-      },
-      defaultItem: {
-        productimage: "",
-        price: "",
-        title: "",
-        description: "",
-        location: "",
-        user_id: "",
-      },
-    }),
-    watch: {
-      detailsDialog(visible) {
-        if (visible) {
-          var delayInMilliseconds = 100;
-
-          setTimeout(function () {
-            //your code to be executed after 1 second
-            document.querySelector(
-              "div.v-text-field__details > div > div"
-            ).innerHTML =
-              "Don't share your email, phone or financial information.";
-          }, delayInMilliseconds);
-        }
-      },
+    buySell: "",
+    postsData: [],
+    sellerName: "",
+    usersNames: [],
+    details: {
+      post_id: "",
+      productimage: "",
+      price: "",
+      title: "",
+      description: "",
+      location: "",
+      user_id: "",
     },
-    methods: {
-      sendMsgToSeller(post_id) {
-        // close the form
-        //this.detailsDialog = false;
+    detailsDialog: false,
+    postsLoading: true,
+    msg: "",
+    add: true,
+    search: "",
+    loading: true,
+    showPassword: false,
+    posts: [],
+    userPosts: [],
+    id: "", // id to update PUT:id, was set by GET:id
+    headTitle: [
+      { text: "Item", value: "productimage" },
+      { text: "Price", value: "price" },
+      { text: "Title", value: "title" },
+      { text: "Description", value: "description" },
+      { text: "Location", value: "location" },
+      { text: "Actions", value: "actions" },
+    ],
+    formValues: {
+      productimage: "",
+      price: "",
+      title: "",
+      description: "",
+      location: "",
+      user_id: "",
+    },
+    editedIndex: -1,
+    editedItem: {
+      productimage: "",
+      price: "",
+      title: "",
+      description: "",
+      location: "",
+      user_id: "",
+    },
+    defaultItem: {
+      productimage: "",
+      price: "",
+      title: "",
+      description: "",
+      location: "",
+      user_id: "",
+    },
+  }),
+  watch: {
+    detailsDialog(visible) {
+      if (visible) {
+        var delayInMilliseconds = 100;
 
-        // set data
-        this.msgFormValues.post_id = post_id;
-        this.msgFormValues.user_id = this.formValues.user_id;
+        setTimeout(function () {
+          //your code to be executed after 1 second
+          document.querySelector(
+            "div.v-text-field__details > div > div"
+          ).innerHTML =
+            "Don't share your email, phone or financial information.";
+        }, delayInMilliseconds);
+      }
+    },
+  },
+  methods: {
+    sendMsgToSeller(post_id) {
+      // close the form
+      //this.detailsDialog = false;
 
-        // push the new message
-        //this.msglist.push(this.msgFormValues);
+      // set data
+      this.msgFormValues.post_id = post_id;
+      this.msgFormValues.user_id = this.formValues.user_id;
 
-        //save to message database
-        fetch(apiMessages, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(this.msgFormValues),
+      // push the new message
+      //this.msglist.push(this.msgFormValues);
+
+      //save to message database
+      fetch(apiMessages, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.msgFormValues),
+      })
+        .then((response) => response.text())
+        .then((data) => {
+          console.log(data);
+          this.getAllMessages(); // refresh all message list
+          this.reloadMsg++; // changing the key to force component reload
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
+    },
+    appendMessageToSeller(msg) {
+      this.msgFormValues.message += msg;
+      document.getElementById("messageToSeller").focus();
+    },
+    showImage(imageUrls) {
+      let urls = "";
+      if (imageUrls) {
+        const imgArr = imageUrls.split(",");
+        imgArr.forEach((element) => {
+          urls += `<img src="${element}" width="50">`;
+        });
+      }
+      return urls;
+    },
+    getAllPosts() {
+      fetch(apiPosts)
+        .then((response) => response.json())
+        .then((data) => {
+          // set posts data
+          this.posts = data;
+
+          // get user posts
+          if (localStorage.userId) {
+            let postData = [];
+            this.posts.forEach((element) => {
+              if (localStorage.userId == element.user_id) {
+                postData.push(element);
+              }
+            });
+            this.userPosts = postData;
+          }
+
+          // group post by post_id
+          data.forEach((post) => {
+            this.postsData[post._id] = post;
+          });
+
+          this.postsLoading = false;
+          this.loading = false;
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
+    },
+    editItem(item) {
+      this.editedIndex = this.userPosts.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.id = item._id;
+      this.add = false;
+    },
+    deleteItem(item) {
+      if (confirm("Are you sure you want to delete this item?")) {
+        const index = this.userPosts.indexOf(item);
+        this.userPosts.splice(index, 1);
+        fetch(apiPosts + item._id, {
+          method: "DELETE",
         })
           .then((response) => response.text())
           .then((data) => {
-            console.log(data);
-            this.getAllMessages(); // refresh all message list
-            this.reloadMsg++; // changing the key to force component reload
+            this.msg = data;
+            this.getAllPosts();
           })
           .catch((err) => {
             if (err) throw err;
           });
-      },
-      appendMessageToSeller(msg) {
-        this.msgFormValues.message += msg;
-        document.getElementById("messageToSeller").focus();
-      },
-      showImage(imageUrls) {
-        let urls = "";
-        if (imageUrls) {
-          const imgArr = imageUrls.split(",");
-          imgArr.forEach((element) => {
-            urls += `<img src="${element}" width="50">`;
-          });
-        }
-        return urls;
-      },
-      getPosts() {
-        fetch(apiPosts)
-          .then((response) => response.json())
-          .then((data) => {
-            // set posts data
-            this.posts = data;
-
-            // get user posts
-            if (localStorage.userId) {
-              let postData = [];
-              this.posts.forEach((element) => {
-                if (localStorage.userId == element.user_id) {
-                  postData.push(element);
-                }
-              });
-              this.userPosts = postData;
-            }
-
-            data.forEach((post) => {
-              this.postsData[post._id] = post;
-
-              // saving all messages per post_id
-              this.postMessages[post._id] = this.getPostMessages(post._id);
-            });
-            console.log(this.postMessages);
-            this.postsLoading = false;
-            this.loading = false;
-          })
-          .catch((err) => {
-            if (err) throw err;
-          });
-      },
-      editItem(item) {
-        this.editedIndex = this.userPosts.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.id = item._id;
-        this.add = false;
-      },
-      deleteItem(item) {
-        if (confirm("Are you sure you want to delete this item?")) {
-          const index = this.userPosts.indexOf(item);
-          this.userPosts.splice(index, 1);
-          fetch(apiPosts + item._id, {
-            method: "DELETE",
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              this.msg = data;
-              this.getPosts();
-            })
-            .catch((err) => {
-              if (err) throw err;
-            });
-          console.log("confirm delete");
-        } else {
-          console.log("cancel delete");
-        }
-      },
-      close() {
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          if (this.add) {
-            this.userPosts.shift(this.editedItem);
-            this.editItem(this.editedItem);
-          }
-        }, 300);
-      },
-      addNew() {
-        this.store.state.showLogin = true;
-        const addObj = Object.assign({}, this.defaultItem);
-        this.userPosts.unshift(addObj);
-        this.editItem(addObj);
-        this.add = true;
-      },
-      save() {
-        if (this.editedIndex > -1) {
-          this.formValues.price = this.editedItem.price;
-          this.formValues.title = this.editedItem.title;
-          this.formValues.description = this.editedItem.description;
-          this.formValues.location = this.editedItem.location;
-
-          let fetchApi = this.id ? apiPosts + this.id : apiPosts;
-          let fetchMethod = this.id ? "PUT" : "POST";
-          fetch(fetchApi, {
-            method: fetchMethod,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(this.formValues),
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              this.msg = data;
-              this.getPosts();
-            })
-            .catch((err) => {
-              if (err) throw err;
-            });
-        }
-        this.close();
-      },
-      uploadImage(event) {
-        try {
-          console.log("ping !");
-          const bodyFormData = new formData();
-          bodyFormData.append("image", event); // event = is our image object
-
-          const apiUrl = "https://api.imgbb.com/1/upload";
-          const apiKey = "bdcadd576cf26e4fe1f31de4594ca4fd";
-          axios({
-            method: "POST",
-            url: apiUrl + "?key=" + apiKey,
-            data: bodyFormData,
-            header: { "Content-Type": "multipart/form-data" },
-          })
-            .then((response) => {
-              console.log("API response ↓");
-              console.log(response);
-              console.log(response.data.data.url); // image url
-              //this.uploadedImage = response.data.data.url; // assign to data property
-              this.editedItem.productimage = response.data.data.url; // assign to data property
-              this.formValues.productimage = response.data.data.url;
-            })
-            .catch((err) => {
-              console.log("API error ↓");
-              console.log(err);
-
-              if (err.response.data.error) {
-                console.log(err.response.data.error);
-                //When trouble shooting, simple informations about the error can be found in err.response.data.error so it's good to display it
-              }
-            });
-        } catch (error) {
-          console.log(error);
-        }
-      },
-
-      getPostMessages(post_id) {
-        let singlePost = [];
-        console.log(" xxx:  " + post_id + " xxx " + this.allMessages.length);
-        if (post_id) {
-          if (this.allMessages.length) {
-            this.allMessages.forEach((message) => {
-              // intermittent
-              // console.log("a " + typeof message.post_id);
-              // console.log("b " + typeof post_id);
-              if (message.post_id == post_id) {
-                console.log(message.post_id + " = " + post_id);
-                singlePost.push(message);
-              }
-            });
-          } else {
-            console.log("no dataaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaa");
-          }
-        }
-        return singlePost;
-      },
-
-      getMessages(post_id) {
-        this.msglist = [];
-        if (post_id) {
-          let singlePost = [];
-          this.allMessages.forEach((element) => {
-            if (element.post_id == post_id) {
-              singlePost.push(element);
-            }
-          });
-          this.msglist = singlePost;
-        }
-      },
-      showDetails(post_id) {
-        // clear message to seller
-        this.msgFormValues.message = "";
-
-        this.getMessages(post_id);
-
-        let data = this.postsData[post_id];
-        this.details.post_id = post_id;
-        this.details.productimage = data.productimage;
-        this.details.price = data.price;
-        this.details.title = data.title;
-        this.details.description = data.description;
-        this.details.location = data.location;
-        this.details.user_id = data.user_id;
-
-        this.sellerName = this.usersNames[data.user_id];
-        this.detailsDialog = true;
-      },
-      detailClose() {
-        this.detailsDialog = false;
-      },
-      getAllMessages() {
-        fetch(apiMessages)
-          .then((response) => response.json())
-          .then((data) => {
-            this.allMessages = data;
-          })
-          .catch((err) => {
-            if (err) throw err;
-          });
-      },
-    },
-    mounted() {
-      // get all messages
-      this.getAllMessages();
-
-      // call get all post
-      this.getPosts();
-
-      // set user_id
-      if (localStorage.userId) {
-        this.formValues.user_id = localStorage.userId;
+        console.log("confirm delete");
+      } else {
+        console.log("cancel delete");
       }
+    },
+    close() {
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        if (this.add) {
+          this.userPosts.shift(this.editedItem);
+          this.editItem(this.editedItem);
+        }
+      }, 300);
+    },
+    addNew() {
+      this.store.state.showLogin = true;
+      const addObj = Object.assign({}, this.defaultItem);
+      this.userPosts.unshift(addObj);
+      this.editItem(addObj);
+      this.add = true;
+    },
+    save() {
+      if (this.editedIndex > -1) {
+        this.formValues.price = this.editedItem.price;
+        this.formValues.title = this.editedItem.title;
+        this.formValues.description = this.editedItem.description;
+        this.formValues.location = this.editedItem.location;
 
-      // get all users
-      fetch(apiUsers, {
-        method: "GET",
-      })
+        let fetchApi = this.id ? apiPosts + this.id : apiPosts;
+        let fetchMethod = this.id ? "PUT" : "POST";
+        fetch(fetchApi, {
+          method: fetchMethod,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.formValues),
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            this.msg = data;
+            this.getAllPosts();
+          })
+          .catch((err) => {
+            if (err) throw err;
+          });
+      }
+      this.close();
+    },
+    uploadImage(event) {
+      try {
+        console.log("ping !");
+        const bodyFormData = new formData();
+        bodyFormData.append("image", event); // event = is our image object
+
+        const apiUrl = "https://api.imgbb.com/1/upload";
+        const apiKey = "bdcadd576cf26e4fe1f31de4594ca4fd";
+        axios({
+          method: "POST",
+          url: apiUrl + "?key=" + apiKey,
+          data: bodyFormData,
+          header: { "Content-Type": "multipart/form-data" },
+        })
+          .then((response) => {
+            console.log("API response ↓");
+            console.log(response);
+            console.log(response.data.data.url); // image url
+            this.editedItem.productimage = response.data.data.url; // assign to data property
+            this.formValues.productimage = response.data.data.url;
+          })
+          .catch((err) => {
+            console.log("API error ↓");
+            console.log(err);
+
+            if (err.response.data.error) {
+              console.log(err.response.data.error);
+              //When trouble shooting, simple informations about the error can be found in err.response.data.error so it's good to display it
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    getMessages(post_id) {
+      this.msglist = [];
+      if (post_id) {
+        let singlePost = [];
+        this.allMessages.forEach((msg) => {
+          if (msg.post_id == post_id) {
+            singlePost.push(msg);
+          }
+        });
+        this.msglist = singlePost;
+      }
+    },
+    showDetails(post_id) {
+      // clear message to seller
+      this.msgFormValues.message = "";
+
+      this.getMessages(post_id);
+
+      let data = this.postsData[post_id];
+      this.details.post_id = post_id;
+      this.details.productimage = data.productimage;
+      this.details.price = data.price;
+      this.details.title = data.title;
+      this.details.description = data.description;
+      this.details.location = data.location;
+      this.details.user_id = data.user_id;
+
+      this.sellerName = this.usersNames[data.user_id];
+      this.detailsDialog = true;
+    },
+    detailClose() {
+      this.detailsDialog = false;
+    },
+    getAllMessages() {
+      fetch(apiMessages)
         .then((response) => response.json())
         .then((data) => {
-          data.forEach((element) => {
-            this.usersNames[element._id] =
-              element.firstname.charAt(0).toUpperCase() +
-              element.firstname.slice(1) +
-              " " +
-              element.lastname.charAt(0).toUpperCase() +
-              element.lastname.slice(1);
+          // all messages
+          this.allMessages = data;
+
+          // grouping message by post_id
+          this.postMessages = this.allMessages.reduce((results, msg) => {
+            results[msg.post_id] = results[msg.post_id] || [];
+            results[msg.post_id].push(msg);
+            return results;
           });
         })
         .catch((err) => {
           if (err) throw err;
         });
     },
-  };
+    getAllUsers() {
+      fetch(apiUsers, {
+        method: "GET",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((user) => {
+            this.usersNames[user._id] =
+              user.firstname.charAt(0).toUpperCase() +
+              user.firstname.slice(1) +
+              " " +
+              user.lastname.charAt(0).toUpperCase() +
+              user.lastname.slice(1);
+          });
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
+    },
+  },
+  mounted() {
+    // get all users
+    this.getAllUsers();
+
+    // call get all post
+    this.getAllPosts();
+
+    // get all messages
+    this.getAllMessages();
+
+    // set user_id
+    if (localStorage.userId) {
+      this.formValues.user_id = localStorage.userId;
+    }
+  },
+};
 </script>
 
 <style scoped>
-  #card {
-    cursor: pointer;
-  }
+#card {
+  cursor: pointer;
+}
 
-  /* striped */
-  tbody tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
+/* striped */
+tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 
-  .v-btn:not(.v-btn--round).v-size--default {
-    height: auto;
-  }
+.v-btn:not(.v-btn--round).v-size--default {
+  height: auto;
+}
 
-  .w-100 {
-    width: 100%;
-  }
+.w-100 {
+  width: 100%;
+}
 </style>
