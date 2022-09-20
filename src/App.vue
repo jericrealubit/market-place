@@ -6,10 +6,16 @@
     <v-app-bar app color="primary" dark dense>
       <v-toolbar-title>Market Place</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn text rounded @click="setBuying">Buy</v-btn>
-      <v-btn text rounded @click="setSelling">Sell</v-btn>
-      <v-btn text rounded>{{ loggedUser }}</v-btn>
-      <v-btn v-if="loggedUser != 'guest'" text rounded @click="logout" title="logout">
+      <v-btn text rounded @click="setBuying" :outlined="outlined">Buy</v-btn>
+      <v-btn text rounded @click="setSelling" :outlined="!outlined">Sell</v-btn>
+      <v-btn text rounded disabled>{{ loggedUser }}</v-btn>
+      <v-btn
+        v-if="loggedUser != 'guest'"
+        text
+        rounded
+        @click="logout"
+        title="logout"
+      >
         <v-icon small>mdi-logout</v-icon>
       </v-btn>
       <v-btn v-else text rounded @click="login" title="login">
@@ -53,6 +59,7 @@ export default {
   components: { PostList, UserLogin },
   name: "App",
   data: () => ({
+    outlined: true,
     loggedUser: "guest",
     loginform: false,
   }),
@@ -71,9 +78,11 @@ export default {
   methods: {
     setSelling() {
       store.state.buying = false;
+      this.outlined = !this.outlined;
     },
     setBuying() {
       store.state.buying = true;
+      this.outlined = !this.outlined;
     },
     logout() {
       localStorage.removeItem("loggedUser");
@@ -95,6 +104,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

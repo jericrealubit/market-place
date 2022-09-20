@@ -160,7 +160,7 @@
               indeterminate
             ></v-progress-linear>
           </template>
-
+          <!--
           <v-card-text>
             <ul>
               <li v-for="(postmsg, i) in postMessages[post._id]" :key="i">
@@ -168,7 +168,7 @@
                 {{ postmsg.message }}
               </li>
             </ul>
-          </v-card-text>
+          </v-card-text> -->
 
           <v-img
             :src="post.productimage"
