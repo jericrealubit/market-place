@@ -38,3 +38,9 @@ export default {
   data: () => ({}),
 };
 </script>
+
+<style scoped>
+.v-divider {
+  flex: 1 1 1px !important; /* needed as v-divider is not showing when deployed to netlify  */
+}
+</style>
