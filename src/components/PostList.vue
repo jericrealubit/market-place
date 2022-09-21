@@ -664,7 +664,7 @@ export default {
             results[msg.post_id] = results[msg.post_id] || [];
             results[msg.post_id].push(msg);
             return results;
-          });
+          }, {});
         })
         .catch((err) => {
           if (err) throw err;

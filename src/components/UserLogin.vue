@@ -100,7 +100,8 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="formValues.email"
+                        :value="formValues.email"
+                        @input="textToLower"
                         :rules="emailRules"
                         label="E-mail"
                         required
@@ -165,148 +166,151 @@
 </template>
 
 <script>
-  const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
+const apiUsers = "https://api-users-jeric.netlify.app/.netlify/functions/api";
 
-  import { inject } from "vue";
-  export default {
-    setup() {
-      const store = inject("store");
+import { inject } from "vue";
+export default {
+  setup() {
+    const store = inject("store");
 
-      return {
-        store,
-      };
+    return {
+      store,
+    };
+  },
+
+  name: "UserLogin",
+  data: () => ({
+    isEmailError: false,
+    emailErrorMsg: "Email is already taken",
+    isLoginError: false,
+    loginErrorMsg: "Email or Password does not match",
+    loggedUser: "",
+    users: [],
+    dialog: true,
+    tab: 0,
+    tabs: [
+      { name: "Login", icon: "mdi-account" },
+      { name: "Register", icon: "mdi-account-outline" },
+    ],
+    isFormValid: true,
+    formValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
     },
-
-    name: "UserLogin",
-    data: () => ({
-      isEmailError: false,
-      emailErrorMsg: "Email is already taken",
-      isLoginError: false,
-      loginErrorMsg: "Email or Password does not match",
-      loggedUser: "",
-      users: [],
-      dialog: true,
-      tab: 0,
-      tabs: [
-        { name: "Login", icon: "mdi-account" },
-        { name: "Register", icon: "mdi-account-outline" },
-      ],
-      isFormValid: true,
-      formValues: {
-        firstname: "",
-        lastname: "",
-        email: "",
-        password: "",
-      },
-      loginFormValue: {
-        loginEmail: "",
-        loginPassword: "",
-      },
-      verify: "",
-      loginEmailRules: [
-        (v) => !!v || "Required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-      ],
-      emailRules: [
-        (v) => !!v || "Required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-      ],
-
-      show1: false,
-      rules: {
-        required: (value) => !!value || "Required.",
-        min: (v) => (v && v.length >= 8) || "Min 8 characters",
-      },
-    }),
-    computed: {
-      passwordMatch() {
-        return () =>
-          this.formValues.password === this.verify || "Password must match";
-      },
+    loginFormValue: {
+      loginEmail: "",
+      loginPassword: "",
     },
-    methods: {
-      register() {
-        let validform = this.$refs.registerForm.validate();
-        if (validform) {
-          // check email from database
-          this.users.forEach((element) => {
-            if (element.email == this.formValues.email) {
-              this.isEmailError = true;
-            }
-          });
+    verify: "",
+    loginEmailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    emailRules: [
+      (v) => !!v || "Required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
 
-          if (!this.isEmailError) {
-            fetch(apiUsers, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(this.formValues),
+    show1: false,
+    rules: {
+      required: (value) => !!value || "Required.",
+      min: (v) => (v && v.length >= 8) || "Min 8 characters",
+    },
+  }),
+  computed: {
+    passwordMatch() {
+      return () =>
+        this.formValues.password === this.verify || "Password must match";
+    },
+  },
+  methods: {
+    textToLower(val) {
+      this.formValues.email = val.toLowerCase();
+    },
+    register() {
+      let validform = this.$refs.registerForm.validate();
+      if (validform) {
+        // check email from database
+        this.users.forEach((element) => {
+          if (element.email == this.formValues.email.toLocaleLowerCase()) {
+            this.isEmailError = true;
+          }
+        });
+
+        if (!this.isEmailError) {
+          fetch(apiUsers, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.formValues),
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              console.log(data);
+              this.dialog = false;
+              this.loggedUser =
+                this.formValues.firstname + " " + this.formValues.lastname;
+              // localStorage
+              localStorage.userId = data; // inserted document id
+              localStorage.loggedUser = this.loggedUser;
+              this.$emit("logged-user", this.loggedUser);
+              document.location.reload(true); // force page reload to show admin table
             })
-              .then((response) => response.text())
-              .then((data) => {
-                console.log(data);
-                this.dialog = false;
-                this.loggedUser =
-                  this.formValues.firstname + " " + this.formValues.lastname;
-                // localStorage
-                localStorage.userId = data; // inserted document id
-                localStorage.loggedUser = this.loggedUser;
-                this.$emit("logged-user", this.loggedUser);
-                document.location.reload(true); // force page reload to show admin table
-              })
-              .catch((err) => {
-                if (err) throw err;
-              });
-          }
+            .catch((err) => {
+              if (err) throw err;
+            });
         }
-      },
-      login() {
-        // let validform = this.$refs.loginForm.validate();
-        // if (validform) {
-        // verify login details
-        this.users.forEach((users) => {
-          if (
-            users.email == this.loginFormValue.loginEmail &&
-            users.password == this.loginFormValue.loginPassword
-          ) {
-            this.loggedUser = users.firstname + " " + users.lastname;
-            // localStorage
-            localStorage.userId = users._id;
-            localStorage.loggedUser = this.loggedUser;
-          }
-        });
-        if (this.loggedUser) {
-          console.log("login successful");
-          this.dialog = false;
-          this.$emit("logged-user", this.loggedUser);
-          document.location.reload(true); // force page reload to show admin table
-        } else {
-          console.log("login failed");
-          this.isLoginError = true;
-        }
-        // }
-      },
-      hideLoginErrorMsg() {
-        this.isLoginError = false;
-      },
-      hideEmailErrorMsg() {
-        this.isEmailError = false;
-      },
-    },
-    mounted() {
-      // check if user is logged-in, do not show login form
-      if (localStorage.loggedUser) {
-        this.dialog = false;
       }
-
-      // get all users
-      fetch(apiUsers)
-        .then((response) => response.json())
-        .then((data) => {
-          this.users = data;
-        })
-        .catch((err) => {
-          if (err) throw err;
-        });
     },
-  };
+    login() {
+      // let validform = this.$refs.loginForm.validate();
+      // if (validform) {
+      // verify login details
+      this.users.forEach((users) => {
+        if (
+          users.email == this.loginFormValue.loginEmail.toLowerCase() &&
+          users.password == this.loginFormValue.loginPassword
+        ) {
+          this.loggedUser = users.firstname + " " + users.lastname;
+          // localStorage
+          localStorage.userId = users._id;
+          localStorage.loggedUser = this.loggedUser;
+        }
+      });
+      if (this.loggedUser) {
+        console.log("login successful");
+        this.dialog = false;
+        this.$emit("logged-user", this.loggedUser);
+        document.location.reload(true); // force page reload to show admin table
+      } else {
+        console.log("login failed");
+        this.isLoginError = true;
+      }
+      // }
+    },
+    hideLoginErrorMsg() {
+      this.isLoginError = false;
+    },
+    hideEmailErrorMsg() {
+      this.isEmailError = false;
+    },
+  },
+  mounted() {
+    // check if user is logged-in, do not show login form
+    if (localStorage.loggedUser) {
+      this.dialog = false;
+    }
+
+    // get all users
+    fetch(apiUsers)
+      .then((response) => response.json())
+      .then((data) => {
+        this.users = data;
+      })
+      .catch((err) => {
+        if (err) throw err;
+      });
+  },
+};
 </script>

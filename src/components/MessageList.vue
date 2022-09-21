@@ -8,7 +8,6 @@
       <v-list-item v-for="(msg, i) in msglist" :key="i">
         <v-list-item-content>
           <v-list-item-title>
-            {{ msg.post_id }}:
             {{
               msg.user_id ? usersNames[msg.user_id] : "Guest"
             }}</v-list-item-title
@@ -24,18 +23,18 @@
 </template>
 
 <script>
-  export default {
-    name: "MessageList",
-    props: {
-      msglist: {
-        type: Array,
-        required: true,
-      },
-      usersNames: {
-        type: Array,
-        required: true,
-      },
+export default {
+  name: "MessageList",
+  props: {
+    msglist: {
+      type: Array,
+      required: true,
     },
-    data: () => ({}),
-  };
+    usersNames: {
+      type: Array,
+      required: true,
+    },
+  },
+  data: () => ({}),
+};
 </script>
