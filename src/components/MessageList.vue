@@ -7,9 +7,11 @@
       </v-card-title>
       <v-list-item v-for="(msg, i) in msglist" :key="i">
         <v-list-item-content>
-          <v-list-item-title>{{
-            msg.user_id ? usersNames[msg.user_id] : "Guest"
-          }}</v-list-item-title>
+          <v-list-item-title>
+            {{
+              msg.user_id ? usersNames[msg.user_id] : "Guest"
+            }}</v-list-item-title
+          >
           <v-list-item-subtitle class="text-wrap">{{
             msg.message
           }}</v-list-item-subtitle>
@@ -36,3 +38,9 @@ export default {
   data: () => ({}),
 };
 </script>
+
+<style scoped>
+.v-divider {
+  flex: 1 1 1px !important; /* needed as v-divider is not showing when deployed to netlify  */
+}
+</style>

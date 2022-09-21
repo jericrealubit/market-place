@@ -44,7 +44,11 @@
 
         <v-layout wrap class="pb-5">
           <v-flex>
-            <MessageList :msglist="msglist" :usersNames="usersNames" />
+            <MessageList
+              :msglist="msglist"
+              :usersNames="usersNames"
+              :key="reloadMsg"
+            />
           </v-flex>
         </v-layout>
 
@@ -156,6 +160,15 @@
               indeterminate
             ></v-progress-linear>
           </template>
+          <!--
+          <v-card-text>
+            <ul>
+              <li v-for="(postmsg, i) in postMessages[post._id]" :key="i">
+                {{ postmsg.user_id ? usersNames[postmsg.user_id] : "Guest" }}:
+                {{ postmsg.message }}
+              </li>
+            </ul>
+          </v-card-text> -->
 
           <v-img
             :src="post.productimage"
@@ -319,7 +332,7 @@
             </div>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary" @click="getPosts">Reset</v-btn>
+            <v-btn color="primary" @click="getAllPosts">Reset</v-btn>
           </template>
         </v-data-table>
       </v-card>
@@ -349,6 +362,8 @@ export default {
   components: { MessageList },
   name: "PostList",
   data: () => ({
+    postMessages: [],
+    reloadMsg: 0,
     allMessages: [],
     msglist: [],
     msgFormValues: {
@@ -432,11 +447,14 @@ export default {
   methods: {
     sendMsgToSeller(post_id) {
       // close the form
-      this.detailsDialog = false;
+      //this.detailsDialog = false;
 
       // set data
       this.msgFormValues.post_id = post_id;
       this.msgFormValues.user_id = this.formValues.user_id;
+
+      // push the new message
+      //this.msglist.push(this.msgFormValues);
 
       //save to message database
       fetch(apiMessages, {
@@ -448,6 +466,7 @@ export default {
         .then((data) => {
           console.log(data);
           this.getAllMessages(); // refresh all message list
+          this.reloadMsg++; // changing the key to force component reload
         })
         .catch((err) => {
           if (err) throw err;
@@ -467,7 +486,7 @@ export default {
       }
       return urls;
     },
-    getPosts() {
+    getAllPosts() {
       fetch(apiPosts)
         .then((response) => response.json())
         .then((data) => {
@@ -485,10 +504,11 @@ export default {
             this.userPosts = postData;
           }
 
-          data.forEach((element) => {
-            this.postsData[element._id] = element;
+          // group post by post_id
+          data.forEach((post) => {
+            this.postsData[post._id] = post;
           });
-          //console.log(this.postsData);
+
           this.postsLoading = false;
           this.loading = false;
         })
@@ -512,7 +532,7 @@ export default {
           .then((response) => response.text())
           .then((data) => {
             this.msg = data;
-            this.getPosts();
+            this.getAllPosts();
           })
           .catch((err) => {
             if (err) throw err;
@@ -556,7 +576,7 @@ export default {
           .then((response) => response.text())
           .then((data) => {
             this.msg = data;
-            this.getPosts();
+            this.getAllPosts();
           })
           .catch((err) => {
             if (err) throw err;
@@ -582,7 +602,6 @@ export default {
             console.log("API response ↓");
             console.log(response);
             console.log(response.data.data.url); // image url
-            //this.uploadedImage = response.data.data.url; // assign to data property
             this.editedItem.productimage = response.data.data.url; // assign to data property
             this.formValues.productimage = response.data.data.url;
           })
@@ -599,13 +618,14 @@ export default {
         console.log(error);
       }
     },
+
     getMessages(post_id) {
       this.msglist = [];
       if (post_id) {
         let singlePost = [];
-        this.allMessages.forEach((element) => {
-          if (element.post_id == post_id) {
-            singlePost.push(element);
+        this.allMessages.forEach((msg) => {
+          if (msg.post_id == post_id) {
+            singlePost.push(msg);
           }
         });
         this.msglist = singlePost;
@@ -636,7 +656,34 @@ export default {
       fetch(apiMessages)
         .then((response) => response.json())
         .then((data) => {
+          // all messages
           this.allMessages = data;
+
+          // grouping message by post_id
+          this.postMessages = this.allMessages.reduce((results, msg) => {
+            results[msg.post_id] = results[msg.post_id] || [];
+            results[msg.post_id].push(msg);
+            return results;
+          }, {});
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
+    },
+    getAllUsers() {
+      fetch(apiUsers, {
+        method: "GET",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((user) => {
+            this.usersNames[user._id] =
+              user.firstname.charAt(0).toUpperCase() +
+              user.firstname.slice(1) +
+              " " +
+              user.lastname.charAt(0).toUpperCase() +
+              user.lastname.slice(1);
+          });
         })
         .catch((err) => {
           if (err) throw err;
@@ -644,35 +691,19 @@ export default {
     },
   },
   mounted() {
-    // get all messages
-    this.getAllMessages();
+    // get all users
+    this.getAllUsers();
 
     // call get all post
-    this.getPosts();
+    this.getAllPosts();
+
+    // get all messages
+    this.getAllMessages();
 
     // set user_id
     if (localStorage.userId) {
       this.formValues.user_id = localStorage.userId;
     }
-
-    // get all users
-    fetch(apiUsers, {
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        data.forEach((element) => {
-          this.usersNames[element._id] =
-            element.firstname.charAt(0).toUpperCase() +
-            element.firstname.slice(1) +
-            " " +
-            element.lastname.charAt(0).toUpperCase() +
-            element.lastname.slice(1);
-        });
-      })
-      .catch((err) => {
-        if (err) throw err;
-      });
   },
 };
 </script>
