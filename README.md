@@ -1,9 +1,10 @@
-## User profile
-### https://user-profiles-fe.netlify.app/
+## Market Place (c2c) consumer to consumer 
+### https://market-place-c2c.netlify.app/
 
-## used apid: 
-### https://rest-api-express-mongodb.netlify.app/.netlify/functions/api/
-### https://github.com/jericrealubit/api-users
+## used APIs: 
+### https://github.com/jericrealubit/api-users/
+### https://github.com/jericrealubit/api-posts/
+### https://github.com/jericrealubit/api-messages/
 
 ## Project setup
 ```
