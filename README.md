@@ -1,6 +1,18 @@
 ## Market Place (c2c) consumer to consumer 
 ### https://market-place-c2c.netlify.app/
 
+Use in teaching: FULLSTACK CRUD APPLICATION
+https://docs.google.com/presentation/d/1fRvvYJRDa2pWRcADrtdrhmNBL6cVBpr-q0y7l40E3Os/edit?usp=sharing
+
+Tools used:
+* node.js
+* netlify
+* Github
+* Vue.js
+* Trello
+* Express.js
+* MongoDB
+
 ## used APIs: 
 ### https://github.com/jericrealubit/api-users/
 ### https://github.com/jericrealubit/api-posts/
