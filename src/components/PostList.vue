@@ -211,7 +211,7 @@
           :headers="headTitle"
           :items="userPosts"
           :search="search"
-          :items-per-page="5"
+          :items-per-page="10"
           :loading="loading"
           loading-text="Loading... Please wait"
           class="elevation-1"
@@ -467,6 +467,7 @@ export default {
           console.log(data);
           this.getAllMessages(); // refresh all message list
           this.reloadMsg++; // changing the key to force component reload
+          this.detailsDialog = false;
         })
         .catch((err) => {
           if (err) throw err;
