@@ -24,6 +24,7 @@ Tools used:
 - data-tables - https://vuetifyjs.com/en/components/data-tables/
 - Trello
 - Express.js
+- AWS Lambda
 - MongoDB
 
 ## used APIs:
