@@ -27,7 +27,7 @@ Tools used:
 - AWS Lambda
 - MongoDB
 
-## used APIs:
+## APIs:
 
 ### https://github.com/jericrealubit/api-users/
 
