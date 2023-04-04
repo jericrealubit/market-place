@@ -1,3 +1,5 @@
+### URL: https://market-place-c2c.netlify.app/
+
 ## Market Place (c2c) consumer to consumer
 
 Functionalities:
@@ -8,8 +10,6 @@ Functionalities:
 - Leave Message to a product
 - Register User
 - Login User
-
-### https://market-place-c2c.netlify.app/
 
 Use in teaching: FULLSTACK CRUD APPLICATION
 https://docs.google.com/presentation/d/1fRvvYJRDa2pWRcADrtdrhmNBL6cVBpr-q0y7l40E3Os/edit?usp=sharing
