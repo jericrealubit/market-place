@@ -5,6 +5,7 @@
 Functionalities:
 
 - Create Product listing
+- Upload image to: https://api.imgbb.com/
 - Manage Products
 - View Products for sale
 - Leave Message to a product
